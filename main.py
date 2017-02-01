@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 #!/usr/bin/env python
 #
 # Copyright 2007 Google Inc.
@@ -15,11 +16,13 @@
 # limitations under the License.
 #
 import webapp2
+from handlers.index import *
 
-class MainHandler(webapp2.RequestHandler):
-    def get(self):
-        self.response.write('Hello world!')
+webapp2_config = {}
+webapp2_config['webapp2_extras.sessions'] = {
+    'secret_key': 'Im_an_alien',
+}
 
 app = webapp2.WSGIApplication([
-    ('/', MainHandler)
-], debug=True)
+    ('/', IndexHandler),
+],config=webapp2_config,debug=True)
