@@ -15,14 +15,20 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-import webapp2
-from handlers.index import *
+import sys
+import os
 
-webapp2_config = {}
-webapp2_config['webapp2_extras.sessions'] = {
-    'secret_key': 'Im_an_alien',
-}
+sys.path.append(os.path.join(os.path.abspath('.'), 'venv/Lib/site-packages'))
 
-app = webapp2.WSGIApplication([
-    ('/', IndexHandler),
-],config=webapp2_config,debug=True)
+from credentials import TOKEN
+from webapp2 import WSGIApplication, Route
+
+routes = [
+    # Route for handle webhook (change it using admin rights, maybe..
+    Route('/set_webhook', handler='handlers.hook_handler.WebHookHandler:set_webhook'),
+
+    # Route for Telegram updates
+    Route('/' + TOKEN, handler='handlers.hook_handler.WebHookHandler:webhook_handler')
+
+]
+app = WSGIApplication(routes, debug=False)
