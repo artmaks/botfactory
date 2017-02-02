@@ -11,5 +11,5 @@ https://trefoil-1138.appspot.com/set_webhook
 
 You can chat with bot:
 
-telegram.me/@DeployAndFactoryBot
+https://telegram.me/@DeployAndFactoryBot
 
