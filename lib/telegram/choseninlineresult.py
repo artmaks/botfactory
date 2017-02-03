@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """
-This module contains a object that represents a Telegram ChosenInlineResult
+This module contains an object that represents a Telegram ChosenInlineResult
 """
 
 from telegram import TelegramObject, User, Location
@@ -33,11 +33,16 @@ class ChosenInlineResult(TelegramObject):
         result_id (str):
         from_user (:class:`telegram.User`):
         query (str):
+        location (:class:`telegram.Location`):
+        inline_message_id (str):
 
     Args:
         result_id (str):
         from_user (:class:`telegram.User`):
         query (str):
+        location (Optional[:class:`telegram.Location`]):
+        inline_message_id (Optional[str]):
+        **kwargs (dict): Arbitrary keyword arguments.
 
     """
 
@@ -57,10 +62,11 @@ class ChosenInlineResult(TelegramObject):
         self.inline_message_id = inline_message_id
 
     @staticmethod
-    def de_json(data):
+    def de_json(data, bot):
         """
         Args:
             data (dict):
+            bot (telegram.Bot):
 
         Returns:
             telegram.ChosenInlineResult:
@@ -68,10 +74,10 @@ class ChosenInlineResult(TelegramObject):
         if not data:
             return None
 
-        # Required
-        data['from_user'] = User.de_json(data.pop('from'))
+# Required
+        data['from_user'] = User.de_json(data.pop('from'), bot)
         # Optionals
-        data['location'] = Location.de_json(data.get('location'))
+        data['location'] = Location.de_json(data.get('location'), bot)
 
         return ChosenInlineResult(**data)
 

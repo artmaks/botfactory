@@ -15,28 +15,29 @@ logger = logging.getLogger(__name__)
 from telegram import Bot
 from telegram.ext import Dispatcher, CommandHandler, MessageHandler, Filters
 from credentials import TOKEN
-from handlers.handlers import echo, error, help, start
+from handlers.bot_handlers import echo, error, help, start
 
-dispatcher = None
-bot = Bot(TOKEN)
+dispatcher = {}
+bot = {}
 
-def setup():
+def setup(token):
     '''GAE DISPATCHER SETUP'''
+    bot[token] = Bot(token);
 
     global dispatcher
     # Note that update_queue is setted to None and
     # 0 workers are allowed on Google app Engine (If not-->Problems with multithreading)
-    dispatcher = Dispatcher(bot=bot, update_queue=None, workers=0)
+    dispatcher[token] = Dispatcher(bot=bot[token], update_queue=None, workers=0)
 
     # ---Register handlers here---
-    dispatcher.add_handler(CommandHandler("start", start))
-    dispatcher.add_handler(CommandHandler("help", help))
-    dispatcher.add_handler(MessageHandler([Filters.text], echo))
-    dispatcher.add_error_handler(error)
+    dispatcher[token].add_handler(CommandHandler("start", start))
+    dispatcher[token].add_handler(CommandHandler("help", help))
+    dispatcher[token].add_handler(MessageHandler([Filters.text], echo))
+    dispatcher[token].add_error_handler(error)
 
-    return dispatcher
+    return dispatcher[token]
 
-def webhook(update):
+def webhook(update, token):
     global dispatcher
     # Manually get updates and pass to dispatcher
-    dispatcher.process_update(update)
+    dispatcher[token].process_update(update)

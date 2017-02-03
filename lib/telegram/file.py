@@ -16,12 +16,11 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-"""This module contains a object that represents a Telegram File."""
+"""This module contains an object that represents a Telegram File."""
 
 from os.path import basename
 
 from telegram import TelegramObject
-from telegram.utils.request import download as _download
 
 
 class File(TelegramObject):
@@ -34,25 +33,29 @@ class File(TelegramObject):
 
     Args:
         file_id (str):
-        **kwargs: Arbitrary keyword arguments.
-
-    Keyword Args:
+        bot (telegram.Bot):
         file_size (Optional[int]):
         file_path (Optional[str]):
+        **kwargs (dict): Arbitrary keyword arguments.
+
     """
 
-    def __init__(self, file_id, **kwargs):
+    def __init__(self, file_id, bot, file_size=0, file_path='', **kwargs):
         # Required
         self.file_id = str(file_id)
+
         # Optionals
-        self.file_size = int(kwargs.get('file_size', 0))
-        self.file_path = str(kwargs.get('file_path', ''))
+        self.file_size = int(file_size)
+        self.file_path = str(file_path)
+
+        self.bot = bot
 
     @staticmethod
-    def de_json(data):
+    def de_json(data, bot):
         """
         Args:
-            data (str):
+            data (dict):
+            bot (telegram.Bot):
 
         Returns:
             telegram.File:
@@ -60,12 +63,13 @@ class File(TelegramObject):
         if not data:
             return None
 
-        return File(**data)
+        return File(bot=bot, **data)
 
     def download(self, custom_path=None):
         """
         Args:
             custom_path (str):
+
         """
         url = self.file_path
 
@@ -74,4 +78,4 @@ class File(TelegramObject):
         else:
             filename = basename(url)
 
-        _download(url, filename)
+        self.bot.request.download(url, filename)

@@ -16,7 +16,7 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-"""This module contains a object that represents a Telegram Update."""
+"""This module contains an object that represents a Telegram Update."""
 
 from telegram import (Message, TelegramObject, InlineQuery, ChosenInlineResult, CallbackQuery)
 
@@ -25,40 +25,60 @@ class Update(TelegramObject):
     """This object represents a Telegram Update.
 
     Attributes:
-        update_id (int):
-        message (:class:`telegram.Message`):
-        edited_message (:class:`telegram.Message`):
-        inline_query (:class:`telegram.InlineQuery`):
-        chosen_inline_result (:class:`telegram.ChosenInlineResult`):
-        callback_query (:class:`telegram.CallbackQuery`):
+        update_id (int): The update's unique identifier.
+        message (:class:`telegram.Message`): New incoming message of any kind - text, photo,
+            sticker, etc.
+        edited_message (:class:`telegram.Message`): New version of a message that is known to the
+            bot and was edited
+        inline_query (:class:`telegram.InlineQuery`): New incoming inline query.
+        chosen_inline_result (:class:`telegram.ChosenInlineResult`): The result of an inline query
+            that was chosen by a user and sent to their chat partner.
+        callback_query (:class:`telegram.CallbackQuery`): New incoming callback query.
+        channel_post (Optional[:class:`telegram.Message`]): New incoming channel post of any kind -
+            text, photo, sticker, etc.
+        edited_channel_post (Optional[:class:`telegram.Message`]): New version of a channel post
+            that is known to the bot and was edited.
 
     Args:
         update_id (int):
-        **kwargs: Arbitrary keyword arguments.
-
-    Keyword Args:
         message (Optional[:class:`telegram.Message`]):
         edited_message (Optional[:class:`telegram.Message`]):
         inline_query (Optional[:class:`telegram.InlineQuery`]):
         chosen_inline_result (Optional[:class:`telegram.ChosenInlineResult`])
         callback_query (Optional[:class:`telegram.CallbackQuery`]):
+        channel_post (Optional[:class:`telegram.Message`]):
+        edited_channel_post (Optional[:class:`telegram.Message`]):
+        **kwargs: Arbitrary keyword arguments.
+
     """
 
-    def __init__(self, update_id, **kwargs):
+    def __init__(self,
+                 update_id,
+                 message=None,
+                 edited_message=None,
+                 inline_query=None,
+                 chosen_inline_result=None,
+                 callback_query=None,
+                 channel_post=None,
+                 edited_channel_post=None,
+                 **kwargs):
         # Required
         self.update_id = int(update_id)
         # Optionals
-        self.message = kwargs.get('message')
-        self.edited_message = kwargs.get('edited_message')
-        self.inline_query = kwargs.get('inline_query')
-        self.chosen_inline_result = kwargs.get('chosen_inline_result')
-        self.callback_query = kwargs.get('callback_query')
+        self.message = message
+        self.edited_message = edited_message
+        self.inline_query = inline_query
+        self.chosen_inline_result = chosen_inline_result
+        self.callback_query = callback_query
+        self.channel_post = channel_post
+        self.edited_channel_post = edited_channel_post
 
     @staticmethod
-    def de_json(data):
+    def de_json(data, bot):
         """
         Args:
             data (dict):
+            bot (telegram.Bot):
 
         Returns:
             telegram.Update:
@@ -66,10 +86,13 @@ class Update(TelegramObject):
         if not data:
             return None
 
-        data['message'] = Message.de_json(data.get('message'))
-        data['edited_message'] = Message.de_json(data.get('edited_message'))
-        data['inline_query'] = InlineQuery.de_json(data.get('inline_query'))
-        data['chosen_inline_result'] = ChosenInlineResult.de_json(data.get('chosen_inline_result'))
-        data['callback_query'] = CallbackQuery.de_json(data.get('callback_query'))
+        data['message'] = Message.de_json(data.get('message'), bot)
+        data['edited_message'] = Message.de_json(data.get('edited_message'), bot)
+        data['inline_query'] = InlineQuery.de_json(data.get('inline_query'), bot)
+        data['chosen_inline_result'] = ChosenInlineResult.de_json(
+            data.get('chosen_inline_result'), bot)
+        data['callback_query'] = CallbackQuery.de_json(data.get('callback_query'), bot)
+        data['channel_post'] = Message.de_json(data.get('channel_post'), bot)
+        data['edited_channel_post'] = Message.de_json(data.get('edited_channel_post'), bot)
 
         return Update(**data)
