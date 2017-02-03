@@ -36,6 +36,8 @@ routes = [
     # Route for handle webhook (change it using admin rights, maybe..
     Route('/set_webhook/<token>', handler='handlers.hook_handler.WebHookHandler:set_webhook'),
 
+    Route('/unset_webhook/<token>', handler='handlers.hook_handler.WebHookHandler:unset_webhook'),
+
     # Route for Telegram updates
     Route('/bot_handler/<token>', handler='handlers.hook_handler.WebHookHandler:webhook_handler'),
 
