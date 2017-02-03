@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <title>Title</title>
     <link rel="stylesheet" type="text/css" href="static/styles/table.css" media="all" />
+    <script src="/static/js/jquery.min.js" type="text/javascript" encoding="UTF-8"></script>
 </head>
 <body>
     <section>
@@ -26,12 +27,12 @@
         <table cellpadding="0" cellspacing="0" border="0">
           <tbody>
             {% for i in bots %}
-                <tr>
+                <tr bot-token="{{i.token}}">
                     <td>{{i.name}}</td>
                     <td>{{i.token}}</td>
-                    <td status="{{i.status}}">{{i.status}}</td>
-                    <td><a target="_blank" href="https://trefoil-1138.appspot.com/set_webhook/{{i.token}}">Turn On</a></td>
-                    <td><a target="_blank" href="https://trefoil-1138.appspot.com/unset_webhook/{{i.token}}">Turn Off</a></td>
+                    <td class="status" status="{{i.status}}">{{i.status}}</td>
+                    <td><a href="#" onclick="switchBotOn('{{i.token}}')">Turn On</a></td>
+                    <td><a href="#" onclick="switchBotOff('{{i.token}}')">Turn Off</a></td>
                 </tr>
             {% endfor %}
           </tbody>
@@ -39,5 +40,24 @@
       </div>
     </section>
 
+    <script>
+        function switchBotOn(token) {
+            $.get( "/set_webhook/" + token, function( data ) {
+              if(data == '1') {
+                  $("tr[bot-token='" + token + "'] .status").html('on');
+                  $("tr[bot-token='" + token + "'] .status").css('color', '#c7ff8a');
+              }
+            });
+        }
+
+        function switchBotOff(token) {
+            $.get( "/unset_webhook/" + token, function( data ) {
+              if(data == '1') {
+                  $("tr[bot-token='" + token + "'] .status").html('off');
+                  $("tr[bot-token='" + token + "'] .status").css('color', '#cfcfcf');
+              }
+            });
+        }
+    </script>
 </body>
 </html>
