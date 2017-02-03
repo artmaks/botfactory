@@ -7,7 +7,9 @@ See site by https://trefoil-1138.appspot.com
 
 You can start bot working thorough this link:
 
-trefoil-1138.appspot.com/set_webhook/<token>
+```sh
+https://trefoil-1138.appspot.com/set_webhook/<token>
+```
 
 You can chat with bot:
 
