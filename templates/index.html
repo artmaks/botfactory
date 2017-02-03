@@ -16,7 +16,8 @@
               <th>Name</th>
                 <th>Token</th>
                 <th>Status</th>
-                <th>Manage</th>
+                <th>Turn ON</th>
+                <th>Turn OFF</th>
             </tr>
           </thead>
         </table>
@@ -30,6 +31,7 @@
                     <td>{{i.token}}</td>
                     <td status="{{i.status}}">{{i.status}}</td>
                     <td><a target="_blank" href="https://trefoil-1138.appspot.com/set_webhook/{{i.token}}">Turn On</a></td>
+                    <td><a target="_blank" href="https://trefoil-1138.appspot.com/unset_webhook/{{i.token}}">Turn Off</a></td>
                 </tr>
             {% endfor %}
           </tbody>
