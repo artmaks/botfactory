@@ -3,7 +3,7 @@ from webapp2 import RequestHandler
 
 import telegram
 from telegram import bot
-from message_handler import bot, setup, webhook
+from message_handler import bot, setup, webhook, dispatcher
 from credentials import TOKEN, APP_URL
 import json
 
@@ -19,6 +19,18 @@ class WebHookHandler(RequestHandler):
             self.response.write("Webhook setted for token " + token + " \n see " + url)
         else:
             self.response.write("Webhook setup failed for token" + token)
+
+    def unset_webhook(self, token):
+        if(token not in bot.keys()):
+            self.response.write("Bot already off")
+        else:
+            s = bot[token].setWebhook("")
+            if s:
+                del bot[token]
+                del dispatcher[token]
+                self.response.write("Bot switch off, token: " + token)
+            else:
+                self.response.write("Bot can't switch off (some problem), token: " + token)
 
     def webhook_handler(self, token):
         # Retrieve the message in JSON and then transform it to Telegram object
