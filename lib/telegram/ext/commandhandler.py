@@ -39,15 +39,24 @@ class CommandHandler(Handler):
         pass_args (optional[bool]): If the handler should be passed the
             arguments passed to the command as a keyword argument called `
             ``args``. It will contain a list of strings, which is the text
-            following the command split on spaces. Default is ``False``
+            following the command split on single or consecutive whitespace characters.
+            Default is ``False``
         pass_update_queue (optional[bool]): If set to ``True``, a keyword argument called
             ``update_queue`` will be passed to the callback function. It will be the ``Queue``
             instance used by the ``Updater`` and ``Dispatcher`` that contains new updates which can
-             be used to insert updates. Default is ``False``.
+            be used to insert updates. Default is ``False``.
         pass_job_queue (optional[bool]): If set to ``True``, a keyword argument called
             ``job_queue`` will be passed to the callback function. It will be a ``JobQueue``
             instance created by the ``Updater`` which can be used to schedule new jobs.
             Default is ``False``.
+        pass_user_data (optional[bool]): If set to ``True``, a keyword argument called
+            ``user_data`` will be passed to the callback function. It will be a ``dict`` you
+            can use to keep any data related to the user that sent the update. For each update of
+            the same user, it will be the same ``dict``. Default is ``False``.
+        pass_chat_data (optional[bool]): If set to ``True``, a keyword argument called
+            ``chat_data`` will be passed to the callback function. It will be a ``dict`` you
+            can use to keep any data related to the chat that the update was sent in.
+            For each update in the same chat, it will be the same ``dict``. Default is ``False``.
     """
 
     def __init__(self,
@@ -56,10 +65,15 @@ class CommandHandler(Handler):
                  allow_edited=False,
                  pass_args=False,
                  pass_update_queue=False,
-                 pass_job_queue=False):
-        super(CommandHandler, self).__init__(callback,
-                                             pass_update_queue=pass_update_queue,
-                                             pass_job_queue=pass_job_queue)
+                 pass_job_queue=False,
+                 pass_user_data=False,
+                 pass_chat_data=False):
+        super(CommandHandler, self).__init__(
+            callback,
+            pass_update_queue=pass_update_queue,
+            pass_job_queue=pass_job_queue,
+            pass_user_data=pass_user_data,
+            pass_chat_data=pass_chat_data)
         self.command = command
         self.allow_edited = allow_edited
         self.pass_args = pass_args
@@ -76,12 +90,12 @@ class CommandHandler(Handler):
             return False
 
     def handle_update(self, update, dispatcher):
-        optional_args = self.collect_optional_args(dispatcher)
+        optional_args = self.collect_optional_args(dispatcher, update)
 
         message = update.message or update.edited_message
 
         if self.pass_args:
-            optional_args['args'] = message.text.split(' ')[1:]
+            optional_args['args'] = message.text.split()[1:]
 
         return self.callback(dispatcher.bot, update, **optional_args)
 

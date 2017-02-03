@@ -1,9 +1,9 @@
 .. image:: https://github.com/python-telegram-bot/logos/blob/master/logo-text/png/ptb-logo-text_768.png?raw=true
    :align: center
-   :target: https://github.com/python-telegram-bot/logos
+   :target: https://python-telegram-bot.org
    :alt: python-telegram-bot Logo
 
-Not **just** a Python wrapper around the Telegram Bot API
+We have made you a wrapper you can't refuse
 
 *Stay tuned for library updates and new releases on our* `Telegram Channel <https://telegram.me/pythontelegrambotchannel>`_.
 
@@ -16,7 +16,7 @@ Not **just** a Python wrapper around the Telegram Bot API
    :alt: Supported python versions
 
 .. image:: https://img.shields.io/badge/docs-latest-af1a97.svg
-   :target: https://pythonhosted.org/python-telegram-bot/
+   :target: https://python-telegram-bot.readthedocs.io/
    :alt: Documentation Status
 
 .. image:: https://img.shields.io/pypi/l/python-telegram-bot.svg
@@ -37,7 +37,7 @@ Not **just** a Python wrapper around the Telegram Bot API
 
 .. image:: http://isitmaintained.com/badge/resolution/python-telegram-bot/python-telegram-bot.svg
    :target: http://isitmaintained.com/project/python-telegram-bot/python-telegram-bot
-   :alt: Average time to resolve an issue
+   :alt: Median time to resolve an issue
 
 .. image:: https://img.shields.io/badge/Telegram-Group-blue.svg
    :target: https://telegram.me/pythontelegrambotgroup
@@ -73,8 +73,7 @@ Introduction
 
 This library provides a pure Python interface for the
 `Telegram Bot API <https://core.telegram.org/bots/api>`_.
-It works with Python versions from 2.6+ (**Note:** Support for 2.6 will be dropped at some point
-this year. 2.7 will still be supported).
+It's compatible with Python versions 2.7, 3.3+ and `PyPy <http://pypy.org/>`_.
 It also works with `Google App Engine <https://cloud.google.com/appengine>`_.
 
 In addition to the pure API implementation, this library features a number of high-level classes to
@@ -85,7 +84,7 @@ make the development of bots easy and straightforward. These classes are contain
 Telegram API support
 ====================
 
-As of **28. May 2016**, all types and methods of the Telegram Bot API are supported.
+As of **3. Oct 2016**, all types and methods of the Telegram Bot API are supported.
 
 ==========
 Installing
@@ -96,6 +95,14 @@ You can install or upgrade python-telegram-bot with:
 .. code:: shell
 
     $ pip install python-telegram-bot --upgrade
+
+Or you can install from source with:
+
+.. code:: shell
+
+    $ git clone https://github.com/python-telegram-bot/python-telegram-bot
+    $ cd python-telegram-bot
+    $ python setup.py install
 
 ===============
 Getting started
@@ -109,7 +116,7 @@ Our Wiki contains a lot of resources to get you started with ``python-telegram-b
 Other references:
 
 - `Telegram API documentation <https://core.telegram.org/bots/api>`_
-- `python-telegram-bot documentation <https://pythonhosted.org/python-telegram-bot/>`_
+- `python-telegram-bot documentation <https://python-telegram-bot.readthedocs.io/>`_
 
 -------------------
 Learning by example
@@ -117,21 +124,11 @@ Learning by example
 
 We believe that the best way to learn and understand this simple package is by example. So here
 are some examples for you to review. Even if it's not your approach for learning, please take a
-look at ``echobot2`` (below), it is de facto the base for most of the bots out there. Best of all,
+look at ``echobot2``, it is de facto the base for most of the bots out there. Best of all,
 the code for these examples are released to the public domain, so you can start by grabbing the
 code and building on top of it.
 
-- `echobot2 <https://github.com/python-telegram-bot/python-telegram-bot/blob/master/examples/echobot2.py>`_ replies back messages.
-
-- `inlinebot <https://github.com/python-telegram-bot/python-telegram-bot/blob/master/examples/inlinebot.py>`_ basic example of an `inline bot <https://core.telegram.org/bots/inline>`_.
-
-- `state machine bot <https://github.com/python-telegram-bot/python-telegram-bot/blob/master/examples/state_machine_bot.py>`_ keeps the state for individual users, useful for multipart conversations.
-
-- `timerbot <https://github.com/python-telegram-bot/python-telegram-bot/blob/master/examples/timerbot.py>`_ uses the ``JobQueue`` to send timed messages.
-
-- `echobot <https://github.com/python-telegram-bot/python-telegram-bot/blob/master/examples/legacy/echobot.py>`_ uses only the pure API to echo messages.
-
-Look at the examples on the `wiki <https://github.com/python-telegram-bot/python-telegram-bot/wiki/Examples>`_ to see other bots the community has built.
+Visit `this page <https://github.com/python-telegram-bot/python-telegram-bot/blob/master/examples/README.md>`_ to discover the official examples or look at the examples on the `wiki <https://github.com/python-telegram-bot/python-telegram-bot/wiki/Examples>`_ to see other bots the community has built.
 
 -------
 Logging
@@ -165,7 +162,7 @@ If you want DEBUG logs instead:
 Documentation
 =============
 
-``python-telegram-bot``'s documentation lives at `pythonhosted.org <https://pythonhosted.org/python-telegram-bot/>`_.
+``python-telegram-bot``'s documentation lives at `readthedocs.io <https://python-telegram-bot.readthedocs.io/>`_.
 
 ============
 Getting help

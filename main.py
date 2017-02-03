@@ -23,12 +23,21 @@ sys.path.append(os.path.join(os.path.abspath('.'), 'venv/Lib/site-packages'))
 from credentials import TOKEN
 from webapp2 import WSGIApplication, Route
 
+from handlers.main_handlers import *
+
+webapp2_config = {}
+webapp2_config['webapp2_extras.sessions'] = {
+    'secret_key': 'Im_an_alien',
+}
+
 routes = [
+    ('/', IndexHandler),
+
     # Route for handle webhook (change it using admin rights, maybe..
-    Route('/set_webhook', handler='handlers.hook_handler.WebHookHandler:set_webhook'),
+    Route('/set_webhook/<token>', handler='handlers.hook_handler.WebHookHandler:set_webhook'),
 
     # Route for Telegram updates
-    Route('/' + TOKEN, handler='handlers.hook_handler.WebHookHandler:webhook_handler')
+    Route('/bot_handler/<token>', handler='handlers.hook_handler.WebHookHandler:webhook_handler'),
 
 ]
-app = WSGIApplication(routes, debug=False)
+app = WSGIApplication(routes, config=webapp2_config, debug=False)

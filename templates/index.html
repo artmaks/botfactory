@@ -5,6 +5,21 @@
     <title>Title</title>
 </head>
 <body>
-     {{data_hello}}, {{data_world}}
+    <table border="1">
+        <tr>
+            <th>Name</th>
+            <th>Token</th>
+            <th>Status</th>
+            <th>Manage</th>
+        </tr>
+    {% for i in bots %}
+        <tr>
+            <td>{{i.name}}</td>
+            <td>{{i.token}}</td>
+            <td>{{i.status}}</td>
+            <td><a target="_blank" href="https://trefoil-1138.appspot.com/set_webhook/{{i.token}}">Turn On</a></td>
+        </tr>
+    {% endfor %}
+    </table>
 </body>
 </html>

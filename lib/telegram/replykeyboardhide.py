@@ -16,7 +16,7 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-"""This module contains a object that represents a Telegram
+"""This module contains an object that represents a Telegram
 ReplyKeyboardHide."""
 
 from telegram import ReplyMarkup
@@ -37,17 +37,18 @@ class ReplyKeyboardHide(ReplyMarkup):
         selective (Optional[bool]):
     """
 
-    def __init__(self, hide_keyboard=True, **kwargs):
+    def __init__(self, hide_keyboard=True, selective=False, **kwargs):
         # Required
         self.hide_keyboard = bool(hide_keyboard)
         # Optionals
-        self.selective = bool(kwargs.get('selective', False))
+        self.selective = bool(selective)
 
     @staticmethod
-    def de_json(data):
+    def de_json(data, bot):
         """
         Args:
-            data (str):
+            data (dict):
+            bot(telegram.Bot):
 
         Returns:
             telegram.ReplyKeyboardHide:

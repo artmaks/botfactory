@@ -20,8 +20,16 @@
 
 import logging
 import time
+import warnings
+import datetime
+from numbers import Number
 from threading import Thread, Lock, Event
 from queue import PriorityQueue, Empty
+
+
+class Days(object):
+    MON, TUE, WED, THU, FRI, SAT, SUN = range(7)
+    EVERY_DAY = tuple(range(7))
 
 
 class JobQueue(object):
@@ -29,16 +37,20 @@ class JobQueue(object):
 
     Attributes:
         queue (PriorityQueue):
-        bot (Bot):
-        prevent_autostart (Optional[bool]): If ``True``, the job queue will not be started
-                automatically. Defaults to ``False``
+        bot (telegram.Bot):
 
     Args:
-        bot (Bot): The bot instance that should be passed to the jobs
+        bot (telegram.Bot): The bot instance that should be passed to the jobs
 
+    Deprecated: 5.2
+        prevent_autostart (Optional[bool]): Thread does not start during initialisation.
+        Use `start` method instead.
     """
 
-    def __init__(self, bot, prevent_autostart=False):
+    def __init__(self, bot, prevent_autostart=None):
+        if prevent_autostart is not None:
+            warnings.warn("prevent_autostart is being deprecated, use `start` method instead.")
+
         self.queue = PriorityQueue()
         self.bot = bot
         self.logger = logging.getLogger(self.__class__.__name__)
@@ -51,23 +63,30 @@ class JobQueue(object):
         """:type: float"""
         self._running = False
 
-        if not prevent_autostart:
-            self.logger.debug('Auto-starting %s', self.__class__.__name__)
-            self.start()
-
     def put(self, job, next_t=None):
-        """Queue a new job. If the JobQueue is not running, it will be started.
+        """Queue a new job.
 
         Args:
-            job (Job): The ``Job`` instance representing the new job
-            next_t (Optional[float]): Time in seconds in which the job should be executed first.
-                Defaults to ``job.interval``
+            job (telegram.ext.Job): The ``Job`` instance representing the new job
+            next_t (Optional[int, float, datetime.timedelta]): Time in which the job
+                should be executed first. Defaults to ``job.interval``. ``int`` and ``float``
+                will be interpreted as seconds.
 
         """
         job.job_queue = self
 
         if next_t is None:
-            next_t = job.interval
+            interval = job.interval
+
+            if isinstance(interval, Number):
+                next_t = interval
+            elif isinstance(interval, datetime.timedelta):
+                next_t = interval.total_seconds()
+            else:
+                raise ValueError("The interval argument should be of type datetime.timedelta,"
+                                 " int or float")
+        elif isinstance(next_t, datetime.timedelta):
+            next_t = next_t.total_second()
 
         now = time.time()
         next_t += now
@@ -122,11 +141,11 @@ class JobQueue(object):
                 continue
 
             if job.enabled:
-                self.logger.debug('Running job %s', job.name)
-
                 try:
-                    job.run(self.bot)
-
+                    current_week_day = datetime.datetime.now().weekday()
+                    if any(day == current_week_day for day in job.days):
+                        self.logger.debug('Running job %s', job.name)
+                        job.run(self.bot)
                 except:
                     self.logger.exception('An uncaught error was raised while executing job %s',
                                           job.name)
@@ -199,6 +218,7 @@ class Job(object):
     Attributes:
         callback (function):
         interval (float):
+        days: (tuple)
         repeat (bool):
         name (str):
         enabled (bool): Boolean property that decides if this job is currently active
@@ -207,22 +227,34 @@ class Job(object):
         callback (function): The callback function that should be executed by the Job. It should
             take two parameters ``bot`` and ``job``, where ``job`` is the ``Job`` instance. It
             can be used to terminate the job or modify its interval.
-        interval (float): The interval in which this job should execute its callback function in
-            seconds.
+        interval ([int, float, datetime.timedelta]): The interval in which the job will execute its
+            callback function. ``int`` and ``float`` will be interpreted as seconds.
         repeat (Optional[bool]): If this job should be periodically execute its callback function
             (``True``) or only once (``False``). Defaults to ``True``
         context (Optional[object]): Additional data needed for the callback function. Can be
             accessed through ``job.context`` in the callback. Defaults to ``None``
+        days (Tuple): Defines on which days the job should be ran.
 
     """
     job_queue = None
 
-    def __init__(self, callback, interval, repeat=True, context=None):
+    def __init__(self, callback, interval, repeat=True, context=None, days=Days.EVERY_DAY):
         self.callback = callback
         self.interval = interval
         self.repeat = repeat
         self.context = context
 
+        if not isinstance(days, tuple):
+            raise ValueError("The 'days argument should be of type 'tuple'")
+
+        if not all(isinstance(day, int) for day in days):
+            raise ValueError("The elements of the 'days' argument should be of type 'int'")
+
+        if not all(day >= 0 and day <= 6 for day in days):
+            raise ValueError("The elements of the 'days' argument should be from 0 up to and "
+                             "including 6")
+
+        self.days = days
         self.name = callback.__name__
         self._remove = Event()
         self._enabled = Event()

@@ -16,7 +16,7 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-"""This module contains a object that represents a Telegram Error."""
+"""This module contains an object that represents a Telegram Error."""
 
 
 def _lstrip_str(in_s, lstr):
@@ -85,3 +85,29 @@ class TimedOut(NetworkError):
 
     def __init__(self):
         super(TimedOut, self).__init__('Timed out')
+
+
+class ChatMigrated(TelegramError):
+
+    def __init__(self, new_chat_id):
+        """
+        Args:
+            new_chat_id (int):
+
+        """
+        super(ChatMigrated,
+              self).__init__('Group migrated to supergroup. New chat id: {}'.format(new_chat_id))
+        self.new_chat_id = new_chat_id
+
+
+class RetryAfter(TelegramError):
+
+    def __init__(self, retry_after):
+        """
+        Args:
+            retry_after (int):
+
+        """
+        super(RetryAfter,
+              self).__init__('Flood control exceeded. Retry in {} seconds'.format(retry_after))
+        self.retry_after = float(retry_after)
