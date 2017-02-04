@@ -15,14 +15,15 @@ logger = logging.getLogger(__name__)
 from telegram import Bot
 from telegram.ext import Dispatcher, CommandHandler, MessageHandler, Filters
 from credentials import TOKEN
-from handlers.bot_handlers import echo, error, help, start
+from handlers.bot_handlers import order, checkout, error, help, start
 
 dispatcher = {}
 bot = {}
 
+
 def setup(token):
     '''GAE DISPATCHER SETUP'''
-    bot[token] = Bot(token);
+    bot[token] = Bot(token)
 
     global dispatcher
     # Note that update_queue is setted to None and
@@ -32,10 +33,12 @@ def setup(token):
     # ---Register handlers here---
     dispatcher[token].add_handler(CommandHandler("start", start))
     dispatcher[token].add_handler(CommandHandler("help", help))
-    dispatcher[token].add_handler(MessageHandler([Filters.text], echo))
+    dispatcher[token].add_handler(CommandHandler("order", order))
+    dispatcher[token].add_handler(CommandHandler("checkout", checkout))
     dispatcher[token].add_error_handler(error)
 
     return dispatcher[token]
+
 
 def webhook(update, token):
     global dispatcher
