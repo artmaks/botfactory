@@ -10,6 +10,7 @@ JINJA_ENVIRONMENT = jinja2.Environment(
     extensions=['jinja2.ext.autoescape'],
     autoescape=True)
 
+
 def user_required(handler):
     """
         Decorator for checking if there's a user associated with the current session.
@@ -28,6 +29,7 @@ def user_required(handler):
             return handler(self, *args, **kwargs)
 
     return check_login
+
 
 class BaseHandler(webapp2.RequestHandler):
     """
