@@ -2,9 +2,10 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title>Manage Telegram Bots</title>
+    <link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" media="all" />
     <link rel="stylesheet" type="text/css" href="static/styles/table.css" media="all" />
-    <script src="/static/js/jquery.min.js" type="text/javascript" encoding="UTF-8"></script>
+    <link rel="stylesheet" type="text/css" href="static/styles/modal.css" media="all" />
 </head>
 <body>
     <section>
@@ -14,11 +15,14 @@
         <table cellpadding="0" cellspacing="0" border="0">
           <thead>
             <tr>
-              <th>Name</th>
+                <th>Name</th>
                 <th>Token</th>
+                <th></th>
+                <th>Link</th>
                 <th>Status</th>
                 <th>Turn ON</th>
                 <th>Turn OFF</th>
+                <th>Delete</th>
             </tr>
           </thead>
         </table>
@@ -29,10 +33,13 @@
             {% for i in bots %}
                 <tr bot-token="{{i.token}}">
                     <td>{{i.name}}</td>
-                    <td>{{i.token}}</td>
+                    <td style="font-size: 10px;">{{i.token}}</td>
+                    <td></td>
+                    <td><a target="_blank" href="http://telegram.me/{{i.link}}">Start Chat</a></td>
                     <td class="status" status="{{i.status}}">{{i.status}}</td>
                     <td><a href="#" onclick="switchBotOn('{{i.token}}')">Turn On</a></td>
                     <td><a href="#" onclick="switchBotOff('{{i.token}}')">Turn Off</a></td>
+                    <td><a href="#" onclick="deleteBot('{{i.token}}')">X</a></td>
                 </tr>
             {% endfor %}
           </tbody>
@@ -40,7 +47,66 @@
       </div>
     </section>
 
+    <div class="container">
+        <div class="row">
+            <div class="btn btn-success col-xs-12" data-toggle="modal" data-target="#modal-1">Add bot</div>
+        </div>
+    </div>
+
+
+
+    <div class="modal" id="modal-1" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" data-backdrop="static">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <!-- Modal Header -->
+                <div class="row">
+                    <div class="col-xs-10">
+                        <span class="h2">Add new bot</span>
+                    </div>
+                    <div class="col-xs-2">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    </div>
+                </div>
+
+                <!-- Modal Body. You can insert iframe here -->
+                <div class="row height-md padding-top-md">
+                  <div class="form-group has-success">
+                    <label class="control-label" for="botname">Bot name</label>
+                    <input type="text" class="form-control" id="botname">
+                  </div>
+                  <div class="form-group has-success">
+                    <label class="control-label" for="bottoken">Bot token</label>
+                    <input type="text" class="form-control" id="bottoken">
+                  </div>
+                    <div class="form-group has-success">
+                    <label class="control-label" for="botlink">Bot link</label>
+                    <input type="text" class="form-control" id="botlink">
+                  </div>
+                </div>
+
+                <!-- Modal Footer -->
+                <div class="col-xs-12 text-right">
+                    <button type="button" class="btn btn-success" onclick="addBot()">Add</button>
+                    <button type="button" class="btn" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="/static/js/jquery.min.js" type="text/javascript" encoding="UTF-8"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/velocity/1.4.0/velocity.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" type="text/javascript" encoding="UTF-8"></script>
     <script>
+
+        $(".modal").on('show.bs.modal', function() {
+          $(this).velocity('transition.fadeIn', 1200);
+
+        });
+        $(".modal").on('hide.bs.modal', function() {
+          $(this).velocity('transition.fadeOut', 1200);
+
+        });
+
         function switchBotOn(token) {
             $.get( "/set_webhook/" + token, function( data ) {
               if(data == '1') {
@@ -58,6 +124,31 @@
               }
             });
         }
+
+        function addBot() {
+            let botname = $('#botname').val();
+            let bottoken = $('#bottoken').val();
+            let botlink = $('#botlink').val();
+
+            $.post( "/addbot", { botname: botname, bottoken: bottoken, botlink: botlink })
+            .done(function( data ) {
+                if(data == '1') {
+                    location.reload();
+                }
+            });
+        }
+
+        function deleteBot(token) {
+            $.post( "/deletebot", { bottoken: token })
+            .done(function( data ) {
+                if(data == '1') {
+                    location.reload();
+                } else {
+                    alert(data);
+                }
+            });
+        }
+
     </script>
 </body>
 </html>
