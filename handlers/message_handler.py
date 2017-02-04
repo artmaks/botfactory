@@ -33,8 +33,8 @@ def setup(token):
     # ---Register handlers here---
     dispatcher[token].add_handler(CommandHandler("start", start))
     dispatcher[token].add_handler(CommandHandler("help", help))
-    dispatcher[token].add_handler(CommandHandler("order", order))
-    dispatcher[token].add_handler(CommandHandler("checkout", checkout))
+    dispatcher[token].add_handler(CommandHandler([Filters.text.filter("\order")], order))
+    dispatcher[token].add_handler(CommandHandler([Filters.text.filter("\checkout")], checkout))
     dispatcher[token].add_error_handler(error)
 
     return dispatcher[token]
