@@ -1,11 +1,12 @@
 #!/usr/bin/env python
-from webapp2 import RequestHandler
+import json
 
 import telegram
-from telegram import Bot
-from message_handler import bot, setup, webhook, dispatcher
-from credentials import TOKEN, APP_URL
-import json
+from webapp2 import RequestHandler
+
+from credentials import APP_URL
+from handlers.message_handler import bot, setup, webhook, dispatcher
+
 
 class WebHookHandler(RequestHandler):
     def set_webhook(self, token):
@@ -17,7 +18,7 @@ class WebHookHandler(RequestHandler):
             return
 
         setup(token)
-        url = APP_URL + '/bot_handler/' + token;
+        url = APP_URL + '/bot_handler/' + token
         s = bot[token].setWebhook(url)
         if s:
             self.response.write("1")
@@ -25,7 +26,7 @@ class WebHookHandler(RequestHandler):
             self.response.write("-1")
 
     def unset_webhook(self, token):
-        if(token not in bot.keys()):
+        if token not in bot.keys():
             self.response.write("0")
         else:
             s = bot[token].setWebhook("")
