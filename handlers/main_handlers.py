@@ -1,9 +1,8 @@
 # -*- coding: utf-8 -*-
-import webapp2
-import json
 from handlers.base import BaseHandler
-from message_handler import bot
+from handlers.message_handler import bot
 from models.Models import *
+
 
 class IndexHandler(BaseHandler):
     def get(self):
