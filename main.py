@@ -41,5 +41,8 @@ routes = [
     # Route for Telegram updates
     Route('/bot_handler/<token>', handler='handlers.hook_handler.WebHookHandler:webhook_handler'),
 
+    ('/addbot', AddBotHandler),
+    ('/deletebot', DeleteBotHandler),
+
 ]
 app = WSGIApplication(routes, config=webapp2_config, debug=False)
