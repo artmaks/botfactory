@@ -1,12 +1,23 @@
 # -*- coding: utf-8 -*-
 from handlers.message_handler import logger
+from models.Models import *
 
 orders = {}
 
+# Получить данные по имени бота (имя - ссылка в телеграмме)
+def getBotDataByName(name):
+    bots = [p.to_dict() for p in BotModel.query(BotModel.link == name).fetch()]
+    return bots[0]
 
 def start(bot, update):
     bot.sendMessage(update.message.chat_id, text='Hi!')
 
+#Получить namespace для API бота (в будущем эта функция не нужна)
+def namespace(bot, update):
+    bot_name = bot.name.replace('@', '')
+    data = getBotDataByName(bot_name)
+
+    bot.sendMessage(update.message.chat_id, text=data['api_namespace'])
 
 def help(bot, update):
     bot.sendMessage(update.message.chat_id, text='Help!')
