@@ -16,8 +16,9 @@ class AddBotHandler(BaseHandler):
         name = str(self.request.POST.get("botname"))
         token = str(self.request.POST.get("bottoken"))
         botlink = str(self.request.POST.get("botlink"))
+        api_namespace = str(self.request.POST.get("api_namespace"))
 
-        p = BotModel(name=name, token=token, link=botlink)
+        p = BotModel(name=name, token=token, link=botlink, api_namespace=api_namespace)
         p.put()
         self.response.write('1')
 

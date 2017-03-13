@@ -16,6 +16,7 @@
           <thead>
             <tr>
                 <th>Name</th>
+                <th>Namespace</th>
                 <th>Token</th>
                 <th></th>
                 <th>Link</th>
@@ -33,6 +34,7 @@
             {% for i in bots %}
                 <tr bot-token="{{i.token}}">
                     <td>{{i.name}}</td>
+                    <td>{{i.api_namespace}}</td>
                     <td style="font-size: 10px;">{{i.token}}</td>
                     <td></td>
                     <td><a target="_blank" href="http://telegram.me/{{i.link}}">Start Chat</a></td>
@@ -70,18 +72,22 @@
 
                 <!-- Modal Body. You can insert iframe here -->
                 <div class="row height-md padding-top-md">
-                  <div class="form-group has-success">
-                    <label class="control-label" for="botname">Bot name</label>
-                    <input type="text" class="form-control" id="botname">
-                  </div>
-                  <div class="form-group has-success">
-                    <label class="control-label" for="bottoken">Bot token</label>
-                    <input type="text" class="form-control" id="bottoken">
-                  </div>
                     <div class="form-group has-success">
-                    <label class="control-label" for="botlink">Bot link</label>
-                    <input type="text" class="form-control" id="botlink">
-                  </div>
+                        <label class="control-label" for="botname">Bot name</label>
+                        <input type="text" class="form-control" id="botname">
+                    </div>
+                    <div class="form-group has-success">
+                        <label class="control-label" for="bottoken">Bot token</label>
+                        <input type="text" class="form-control" id="bottoken">
+                    </div>
+                    <div class="form-group has-success">
+                        <label class="control-label" for="botlink">Bot link</label>
+                        <input type="text" class="form-control" id="botlink">
+                    </div>
+                    <div class="form-group has-success">
+                        <label class="control-label" for="botlink">API Namespace</label>
+                        <input type="text" class="form-control" id="api_namespace">
+                    </div>
                 </div>
 
                 <!-- Modal Footer -->
@@ -129,8 +135,9 @@
             let botname = $('#botname').val();
             let bottoken = $('#bottoken').val();
             let botlink = $('#botlink').val();
+            let api_namespace = $('#api_namespace').val();
 
-            $.post( "/addbot", { botname: botname, bottoken: bottoken, botlink: botlink })
+            $.post( "/addbot", { botname: botname, bottoken: bottoken, botlink: botlink, api_namespace: api_namespace })
             .done(function( data ) {
                 if(data == '1') {
                     location.reload();
