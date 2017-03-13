@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from handlers.message_handler import logger
 from models.Models import *
+from API.main import getMenu
 
 orders = {}
 
@@ -18,6 +19,14 @@ def namespace(bot, update):
     data = getBotDataByName(bot_name)
 
     bot.sendMessage(update.message.chat_id, text=data['api_namespace'])
+
+#Получить меню
+def menu(bot, update):
+    bot_name = bot.name.replace('@', '')
+    data = getBotDataByName(bot_name)
+    menu = getMenu(data['api_namespace'])
+
+    bot.sendMessage(update.message.chat_id, text=menu[:30])
 
 def help(bot, update):
     bot.sendMessage(update.message.chat_id, text='Help!')
