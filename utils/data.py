@@ -5,5 +5,5 @@ from models.Models import *
 
 
 def getBotDataByName(name):
-    bots = [p.to_dict() for p in Bot.query(Bot.link == name).fetch()]
+    bots = [p.to_dict() for p in BotModel.query(BotModel.link == name).fetch()]
     return bots[0]

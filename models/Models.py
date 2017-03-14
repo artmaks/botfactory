@@ -2,14 +2,14 @@
 from google.appengine.ext import ndb, db
 
 
-class Bot(ndb.Model):
+class BotModel(ndb.Model):
     name = ndb.StringProperty(default='')
     token = ndb.StringProperty(default='')
     link = ndb.StringProperty(default='')
     api_namespace = ndb.StringProperty(default='')
 
 
-class User(ndb.Model):
+class Users(ndb.Model):
     name = ndb.StringProperty(default='')
     chat_id = ndb.StringProperty(default='')
     api_user_id = ndb.StringProperty(default='')
