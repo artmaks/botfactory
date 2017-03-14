@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 import requests
 import json
-from google.appengine.ext import ndb, db
+from google.appengine.ext import ndb
 from pprint import pprint
 from models.Models import *
 from telegram import InlineKeyboardButton
@@ -280,8 +280,8 @@ def getMenuLayout(namespace, chat_id, callback=None):
         layout = getCategoryLayout(menu, state['steps'])
 
     if cb_type == 'add':
-        item = callback['item']
-        order = db.Key.from_path('Order', chat_id)
+        item = state['item']
+        order = ndb.Key.from_path('Order', chat_id)
         new_item = OrderItem(parent=order, name='name', content=item)
         new_item.put()
         layout = {'text': 'Added!'}

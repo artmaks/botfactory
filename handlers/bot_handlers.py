@@ -106,7 +106,7 @@ def finalize_order(bot, update):
     if chat_id in orders:
         del orders[chat_id]
         bot.sendMessage(chat_id, text='Proceeding to checkout!')
-        order = db.Key.from_path('Order', chat_id)
+        order = ndb.Key.from_path('Order', chat_id)
         order.active = False
         order.put()
     else:
