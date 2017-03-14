@@ -1,18 +1,32 @@
 # -*- coding: utf-8 -*-
 from handlers.message_handler import logger
-from models.Models import *
 from API.main import getMenu, getCategories, getItems
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup
+from utils.register import authStatus, checkAuth, registerNewUser
+from utils.data import getBotDataByName
 
 orders = {}
 
-# Получить данные по имени бота (имя - ссылка в телеграмме)
-def getBotDataByName(name):
-    bots = [p.to_dict() for p in BotModel.query(BotModel.link == name).fetch()]
-    return bots[0]
+
+def text_handler(bot, update):
+    bot_name = bot.name.replace('@', '')
+    data = getBotDataByName(bot_name)
+    namespace = data['api_namespace']
+    name = update.message.text
+    chat_id = update.message.chat_id
+
+    if not authStatus(update.message.chat_id):
+        bot.sendMessage(chat_id=chat_id, text=u"Добрый день, " + name + u"!")
+        user_id = registerNewUser(namespace, name, chat_id)
+        if user_id != 0:
+            bot.sendMessage(chat_id=chat_id, text=u"Вы успешно были зарегистрированы в системе, ваш user_id " + str(user_id))
+    else:
+        bot.sendMessage(chat_id=update.message.chat_id, text="Для просмотра списка комманд введите /help")
+
 
 def start(bot, update):
     bot.sendMessage(update.message.chat_id, text='Hi!')
+
 
 #Получить namespace для API бота (в будущем эта функция не нужна)
 def namespace(bot, update):
@@ -21,7 +35,9 @@ def namespace(bot, update):
 
     bot.sendMessage(update.message.chat_id, text=data['api_namespace'])
 
+
 #Получить меню
+@checkAuth
 def menu(bot, update):
     bot_name = bot.name.replace('@', '')
     data = getBotDataByName(bot_name)
@@ -35,6 +51,8 @@ def menu(bot, update):
 
     update.message.reply_text('Menu:', reply_markup=reply_markup)
 
+
+@checkAuth
 def menu_button(bot, update):
     query = update.callback_query
 
@@ -53,10 +71,13 @@ def menu_button(bot, update):
                         message_id=query.message.message_id,
                         reply_markup=reply_markup)
 
+
+@checkAuth
 def help(bot, update):
     bot.sendMessage(update.message.chat_id, text='Help!')
 
 
+@checkAuth
 def order(bot, update):
     chat_id = update.message.chat_id
     if chat_id in orders:
@@ -66,6 +87,7 @@ def order(bot, update):
         bot.sendMessage(chat_id, text='New order started!')
 
 
+@checkAuth
 def checkout(bot, update):
     chat_id = update.message.chat_id
     if chat_id in orders:
