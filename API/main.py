@@ -174,7 +174,7 @@ def updateChoices(choices, toSelect):
         else:
             choices[i] = False
 
-    return choices
+    return choices #dgdfg
 
 def getOptionLayout(steps, item, option_name):
     choices = getChoicesJson(item, option_name)
