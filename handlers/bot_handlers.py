@@ -37,10 +37,8 @@ def namespace(bot, update):
 
 
 #Получить меню
+@checkAuth
 def menu(bot, update):
-    if not checkAuth(bot, update):
-        return
-
     bot_name = bot.name.replace('@', '')
     data = getBotDataByName(bot_name)
     categories = getCategories(data['api_namespace'])
@@ -54,6 +52,7 @@ def menu(bot, update):
     update.message.reply_text('Menu:', reply_markup=reply_markup)
 
 
+@checkAuth
 def menu_button(bot, update):
     query = update.callback_query
 
@@ -73,10 +72,12 @@ def menu_button(bot, update):
                         reply_markup=reply_markup)
 
 
+@checkAuth
 def help(bot, update):
     bot.sendMessage(update.message.chat_id, text='Help!')
 
 
+@checkAuth
 def order(bot, update):
     chat_id = update.message.chat_id
     if chat_id in orders:
@@ -86,6 +87,7 @@ def order(bot, update):
         bot.sendMessage(chat_id, text='New order started!')
 
 
+@checkAuth
 def checkout(bot, update):
     chat_id = update.message.chat_id
     if chat_id in orders:
