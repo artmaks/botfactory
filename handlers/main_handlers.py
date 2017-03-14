@@ -9,7 +9,7 @@ class IndexHandler(BaseHandler):
         bots = [p.to_dict() for p in Bot.query().fetch()]
         for i in bots:
             i['status'] = 'on' if i['token'] in bot.keys() else 'off'
-        self.render('index.html', {'bots' : bots})
+        self.render('index.html', {'bots': bots})
 
 
 class AddBotHandler(BaseHandler):
