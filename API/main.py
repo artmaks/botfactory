@@ -2,6 +2,7 @@
 import requests
 import json
 from pprint import pprint
+from telegram import InlineKeyboardButton
 
 
 def getMenu(namespace):
@@ -30,29 +31,29 @@ def saveState(st):
     global state
     state = st
 
-def make_step_cat(catlist, name):
+def make_step_cat(catlist, c_id):
     for entry in catlist:
-        if entry['info']['title'] == name:
+        if entry['info']['category_id'] == c_id:
             return entry
 
-def make_step_item(itemlist, name):
+def make_step_item(itemlist, i_id):
     for entry in itemlist:
-        if entry['title'] == name:
+        if entry['id'] == i_id:
             return entry
 
 def make_step(menu, step, first=False):
 
-    name = step['name']
+    it_id = step['id']
 
     if first:
-        return make_step_cat(menu, name)
+        return make_step_cat(menu, it_id)
 
 
     if step['type'] == 'categ':
-        return make_step_cat(menu["categories"], name)
+        return make_step_cat(menu["categories"], it_id)
 
     if step['type'] == 'item':
-        return make_step_item(menu["items"], name)
+        return make_step_item(menu["items"], it_id)
 
 
 def list_categories(categories, steps):
@@ -63,7 +64,8 @@ def list_categories(categories, steps):
     for cat in categories:
         cb = {}
         cb['type'] = 'category'
-        cb['name'] = cat['info']['title']
+        cb['id'] = cat['info']['category_id']
+        # pprint([{'name': cat['info']['title'], 'callback': cb}])
         res += [{'name': cat['info']['title'], 'callback': cb}]
 
     if len(steps) > 0:
@@ -80,7 +82,7 @@ def list_items(items, steps):
     for i in items:
         cb = {}
         cb['type'] = 'item'
-        cb['name'] = i['title']
+        cb['id'] = i['id']
         res += [{'name': i['title'], 'callback': cb}]
 
     if len(steps) > 0:
@@ -149,7 +151,7 @@ def getItemLayout(steps, item):
 
             cb = {}
             cb['type'] = 'option'
-            cb['name'] = opt['title']
+            cb['id'] = opt['modifier_id']
             b['callback'] = cb
 
             buttons += [b]
@@ -201,8 +203,8 @@ def getOptionLayout(item, option_name):
         #
         cb = {}
         # item['group_modifiers'][opt_ind]['choices'] = updateChoices(choices, i)
-        cb['type'] = 'option'
-        cb['name'] = item
+        cb['type'] = 'choice'
+        cb['id'] = ch['id']
 
         button = {}
         button['name'] = name
@@ -232,21 +234,21 @@ def getChoiceIndex(choices, tofind):
 def getMenuLayout(namespace, chat_id, callback=None):
     menu = getMenu(namespace)['menu']
     if callback == None:
-        callback = {'type': 'category', 'name': None}
+        callback = {'type': 'category', 'id': None}
 
     cb_type = callback['type']
     state = getStateByChatId(chat_id)
 
     if cb_type == 'category':
         steps = state['steps']
-        if callback['name'] is not None:
-            step = {'name': callback['name'], 'type': 'categ'}
+        if callback['id'] is not None:
+            step = {'id': callback['id'], 'type': 'categ'}
             state['steps'].append(step)
         layout =  getCategoryLayout(menu, steps)
 
 
     if cb_type == 'item':
-        step = {'name': callback['name'], 'type': 'item'}
+        step = {'id': callback['id'], 'type': 'item'}
         state['steps'].append(step)
         item = getItemsBySteps(menu, state['steps'])
         layout = getItemLayout(state['steps'], item)
@@ -254,13 +256,14 @@ def getMenuLayout(namespace, chat_id, callback=None):
         state['item'] = item
 
     if cb_type == 'option':
-        state['option'] = callback['name']
+        state['option'] = callback['id']
         layout = getOptionLayout(state['item'], state['option'])
 
     if cb_type == 'choice':
         item = state['item']
-        choices, opt_ind = getChoicesJson(item, callback['name'])
-        ch_ind = getChoiceIndex(choices, callback['name'])
+        choices, opt_ind = getChoicesJson(item, callback['id'])
+        ch_ind = getChoiceIndex(choices, callback['id'])
+        ch_ind = getChoiceIndex(choices, callback['id'])
         item['group_modifiers'][opt_ind]['choices'] = updateChoices(choices, ch_ind)
 
         state['item'] = item
@@ -279,6 +282,7 @@ def getMenuLayout(namespace, chat_id, callback=None):
 
 
     saveState(state)
+    # pprint(layout)
     return layoutComplement(layout)
 
 
@@ -309,9 +313,20 @@ def getItems(namespace, category):
 
 #
 # namespace = 'slaviktest'
-# chat_id = '12345'
+# chat_id = 1
 #
 # bs1 = getMenuLayout(namespace, chat_id)['buttons']
+#
+#
+#
+# for b in bs1:
+#     print('\n\n')
+#     print(b['callback'])
+#     js = json.dumps(b['callback'], encoding='utf-8')
+#     print(js)
+#     print(InlineKeyboardButton(b['name'], callback_data=js))
+#
+# pprint(bs1)
 # bs2 = getMenuLayout(namespace, chat_id, bs1[0]['callback'])['buttons']
 #
 # pprint(getMenuLayout(namespace, chat_id, bs2[0]['callback']))
