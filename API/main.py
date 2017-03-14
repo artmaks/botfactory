@@ -221,7 +221,7 @@ def getMenuLayout(namespace, history):
         return getOptionLayout(history['steps'], history['item'], history['option'])
 
     if type == 'add':
-        item = data['item']
+        item = history['item']
         order = db.Key.from_path('Order', chat_id)
         new_item = OrderItem(parent=order, name='name', content=item)
         new_item.put()
