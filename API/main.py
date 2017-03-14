@@ -167,30 +167,35 @@ def getItemLayout(steps, item):
 def getChoicesJson(item, option_name):
     modifiers = item['group_modifiers']
 
-    for mod in modifiers:
+    for i, mod in enumerate(modifiers):
         if mod['title'] == option_name:
-            return mod['choices']
+            return mod['choices'], i
 
 def updateChoices(choices, toSelect):
     for i, ch in enumerate(choices):
         if i == toSelect:
-            choices[i] = True
+            choices[i]['default'] = True
         else:
-            choices[i] = False
+            choices[i]['default'] = False
 
-    return choices #dgdfg
+    return choices
+
+
+
 
 def getOptionLayout(steps, item, option_name):
-    choices = getChoicesJson(item, option_name)
+    choices, opt_ind = getChoicesJson(item, option_name)
 
+    # opt_ind = getIndByOptionName(option_name)
     buttons = []
+    # pprint(list(enumerate(choices)))
     for i, ch in enumerate(choices):
         cost = ch['price']
         title = ch['title']
         name = u"{0} (+{1})".format(title, cost)
-
+        #
         cb = {}
-        item['group_modifiers']['choices'] = updateChoices(choices, i)
+        item['group_modifiers'][opt_ind]['choices'] = updateChoices(choices, i)
         cb['type'] = 'item'
         cb['steps'] = steps
         cb['item'] = item
@@ -199,7 +204,7 @@ def getOptionLayout(steps, item, option_name):
         button['name'] = name
         button['callback'] = cb
 
-        buttons += button
+        buttons += [button]
 
     return {'buttons': buttons}
 
@@ -248,15 +253,15 @@ def getItems(namespace, category):
     return res
 
 
-# spath = u'[{"name": "Кофе", "type": "categ"}, {"name": "Капучино", "type": "item"}]'
-# steps = json.loads(spath)
-# # pprint(steps)
-#
-# menu = getMenu('slaviktest')['menu']
-# step1 = make_step(menu, steps[0], True)
-# step2 = make_step(step1, steps[1], False)
+spath = u'[{"name": "Кофе", "type": "categ"}, {"name": "Капучино", "type": "item"}]'
+steps = json.loads(spath)
+# pprint(steps)
+
+menu = getMenu('slaviktest')['menu']
+step1 = make_step(menu, steps[0], True)
+step2 = make_step(step1, steps[1], False)
 # pprint(getMenuItems('slaviktest', steps[:1]))
-# namespace = 'slaviktest'
+namespace = 'slaviktest'
 
 # history = {}
 # history = {'type': 'category', 'steps': []}
@@ -309,56 +314,56 @@ def getItems(namespace, category):
 #                                       'type': 'item'}],
 #                            'type': 'item'}
 #
-# history = {'item': {u'carbohydrate': 0.0,
-#                                     u'description': u'\u0421\u0440\u0435\u0434\u043d\u0438\u0439 \u043f\u043e \u043a\u0440\u0435\u043f\u043e\u0441\u0442\u0438 \u043d\u0430\u043f\u0438\u0442\u043e\u043a \u043d\u0430 \u043e\u0441\u043d\u043e\u0432\u0435 \u044d\u0441\u043f\u0440\u0435\u0441\u0441\u043e, \u0441 \u0434\u043e\u0431\u0430\u0432\u043b\u0435\u043d\u0438\u0435\u043c \u0432\u0441\u043f\u0435\u043d\u0435\u043d\u043d\u043e\u0433\u043e \u0442\u0435\u043f\u043b\u043e\u0433\u043e \u043c\u043e\u043b\u043e\u043a\u0430 \u0438 \u043c\u044f\u0433\u043a\u043e\u0439 \u043c\u043e\u043b\u043e\u0447\u043d\u043e\u0439 \u043f\u0435\u043d\u043a\u043e\u0439.',
-#                                     u'fat': 0.0,
-#                                     u'fiber': 0.0,
-#                                     u'group_modifiers': [{u'choices': [{u'default': None,
-#                                                                         u'id': u'10',
-#                                                                         u'order': 189,
-#                                                                         u'price': 50.0,
-#                                                                         u'prices': [],
-#                                                                         u'title': u'\u0421\u0440\u0435\u0434\u043d\u0438\u0439'},
-#                                                                        {u'default': True,
-#                                                                         u'id': u'183',
-#                                                                         u'order': 156,
-#                                                                         u'price': 0.0,
-#                                                                         u'prices': [],
-#                                                                         u'title': u'\u041c\u0435\u043b\u043a\u0438\u0439'},
-#                                                                        {u'default': None,
-#                                                                         u'id': u'240',
-#                                                                         u'order': 262,
-#                                                                         u'price': 100.0,
-#                                                                         u'prices': [],
-#                                                                         u'title': u'\u041e\u0433\u0440\u043e\u043c\u043d\u044b\u0439'}],
-#                                                           u'max_value': 1,
-#                                                           u'min_value': 1,
-#                                                           u'modifier_id': u'5652383656837120',
-#                                                           u'order': 133,
-#                                                           u'required': True,
-#                                                           u'title': u'\u041e\u0431\u044a\u0435\u043c'}],
-#                                     u'icon': u'http://lh3.googleusercontent.com/32UZvmrHtPiyZdAxWXTblKy78iMttXnTacVuD1a7aE5skQ4MJP1xjGSlvGB5ZQCxtEVfHq1B9G2t5C6-jmD-Mk135BsdSgJXoQOmsU4FwtZ5SX-y=s128',
-#                                     u'id': u'5091364022779904',
-#                                     u'kal': 0,
-#                                     u'order': 55,
-#                                     u'pic': u'http://lh3.googleusercontent.com/H6k2FeiAtnRwaEH-XSPj-JEZ57U9AnLwt1Gj9cufoE4VwY43l5iAgRPaprX5LCar2GJUd7r5wamdzvxEbEejSN8lzrgkgibk9yrMI_Bk35k9b8k=s960',
-#                                     u'pic_background': u'FFFFFF',
-#                                     u'pic_resize': 0,
-#                                     u'price': 120.0,
-#                                     u'prices': [],
-#                                     u'restrictions': {u'venues': []},
-#                                     u'single_modifiers': [],
-#                                     u'title': u'\u041a\u0430\u043f\u0443\u0447\u0438\u043d\u043e',
-#                                     u'volume': 0.0,
-#                                     u'weight': 0.0},
-#                            'option': u'\u041e\u0431\u044a\u0435\u043c',
-#                            'steps': [{'name': u'\u041a\u043e\u0444\u0435',
-#                                       'type': 'categ'},
-#                                      {'name': u'\u041a\u0430\u043f\u0443\u0447\u0438\u043d\u043e',
-#                                       'type': 'item'}],
-#                            'type': 'option'}
-# # pprint(getMenu('slaviktest'))
-# pprint(getMenuLayout(namespace, history))
+history = {'item': {u'carbohydrate': 0.0,
+                                    u'description': u'\u0421\u0440\u0435\u0434\u043d\u0438\u0439 \u043f\u043e \u043a\u0440\u0435\u043f\u043e\u0441\u0442\u0438 \u043d\u0430\u043f\u0438\u0442\u043e\u043a \u043d\u0430 \u043e\u0441\u043d\u043e\u0432\u0435 \u044d\u0441\u043f\u0440\u0435\u0441\u0441\u043e, \u0441 \u0434\u043e\u0431\u0430\u0432\u043b\u0435\u043d\u0438\u0435\u043c \u0432\u0441\u043f\u0435\u043d\u0435\u043d\u043d\u043e\u0433\u043e \u0442\u0435\u043f\u043b\u043e\u0433\u043e \u043c\u043e\u043b\u043e\u043a\u0430 \u0438 \u043c\u044f\u0433\u043a\u043e\u0439 \u043c\u043e\u043b\u043e\u0447\u043d\u043e\u0439 \u043f\u0435\u043d\u043a\u043e\u0439.',
+                                    u'fat': 0.0,
+                                    u'fiber': 0.0,
+                                    u'group_modifiers': [{u'choices': [{u'default': None,
+                                                                        u'id': u'10',
+                                                                        u'order': 189,
+                                                                        u'price': 50.0,
+                                                                        u'prices': [],
+                                                                        u'title': u'\u0421\u0440\u0435\u0434\u043d\u0438\u0439'},
+                                                                       {u'default': True,
+                                                                        u'id': u'183',
+                                                                        u'order': 156,
+                                                                        u'price': 0.0,
+                                                                        u'prices': [],
+                                                                        u'title': u'\u041c\u0435\u043b\u043a\u0438\u0439'},
+                                                                       {u'default': None,
+                                                                        u'id': u'240',
+                                                                        u'order': 262,
+                                                                        u'price': 100.0,
+                                                                        u'prices': [],
+                                                                        u'title': u'\u041e\u0433\u0440\u043e\u043c\u043d\u044b\u0439'}],
+                                                          u'max_value': 1,
+                                                          u'min_value': 1,
+                                                          u'modifier_id': u'5652383656837120',
+                                                          u'order': 133,
+                                                          u'required': True,
+                                                          u'title': u'\u041e\u0431\u044a\u0435\u043c'}],
+                                    u'icon': u'http://lh3.googleusercontent.com/32UZvmrHtPiyZdAxWXTblKy78iMttXnTacVuD1a7aE5skQ4MJP1xjGSlvGB5ZQCxtEVfHq1B9G2t5C6-jmD-Mk135BsdSgJXoQOmsU4FwtZ5SX-y=s128',
+                                    u'id': u'5091364022779904',
+                                    u'kal': 0,
+                                    u'order': 55,
+                                    u'pic': u'http://lh3.googleusercontent.com/H6k2FeiAtnRwaEH-XSPj-JEZ57U9AnLwt1Gj9cufoE4VwY43l5iAgRPaprX5LCar2GJUd7r5wamdzvxEbEejSN8lzrgkgibk9yrMI_Bk35k9b8k=s960',
+                                    u'pic_background': u'FFFFFF',
+                                    u'pic_resize': 0,
+                                    u'price': 120.0,
+                                    u'prices': [],
+                                    u'restrictions': {u'venues': []},
+                                    u'single_modifiers': [],
+                                    u'title': u'\u041a\u0430\u043f\u0443\u0447\u0438\u043d\u043e',
+                                    u'volume': 0.0,
+                                    u'weight': 0.0},
+                           'option': u'\u041e\u0431\u044a\u0435\u043c',
+                           'steps': [{'name': u'\u041a\u043e\u0444\u0435',
+                                      'type': 'categ'},
+                                     {'name': u'\u041a\u0430\u043f\u0443\u0447\u0438\u043d\u043e',
+                                      'type': 'item'}],
+                           'type': 'option'}
+# pprint(getMenu('slaviktest'))
+pprint(getMenuLayout(namespace, history))
 
 # print('ывпывпвыпывп')
 # print(u'пывпывппывп')
