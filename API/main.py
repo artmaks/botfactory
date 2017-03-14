@@ -178,7 +178,7 @@ def getChoicesJson(item, option_name):
     modifiers = item['group_modifiers']
 
     for i, mod in enumerate(modifiers):
-        if mod['title'] == option_name:
+        if mod['modifier_id'] == option_name:
             return mod['choices'], i
 
 def updateChoices(choices, toSelect):
@@ -194,6 +194,7 @@ def updateChoices(choices, toSelect):
 
 
 def getOptionLayout(item, option_name):
+    pprint(getChoicesJson(item, option_name))
     choices, opt_ind = getChoicesJson(item, option_name)
     buttons = []
     for i, ch in enumerate(choices):
@@ -263,7 +264,6 @@ def getMenuLayout(namespace, chat_id, callback=None):
         item = state['item']
         choices, opt_ind = getChoicesJson(item, callback['id'])
         ch_ind = getChoiceIndex(choices, callback['id'])
-        ch_ind = getChoiceIndex(choices, callback['id'])
         item['group_modifiers'][opt_ind]['choices'] = updateChoices(choices, ch_ind)
 
         state['item'] = item
@@ -311,25 +311,18 @@ def getItems(namespace, category):
     return res
 
 
-#
+
 # namespace = 'slaviktest'
 # chat_id = 1
 #
 # bs1 = getMenuLayout(namespace, chat_id)['buttons']
-#
-#
-#
-# for b in bs1:
-#     print('\n\n')
-#     print(b['callback'])
-#     js = json.dumps(b['callback'], encoding='utf-8')
-#     print(js)
-#     print(InlineKeyboardButton(b['name'], callback_data=js))
-#
+
+
 # pprint(bs1)
-# bs2 = getMenuLayout(namespace, chat_id, bs1[0]['callback'])['buttons']
+# bs2 = getMenuLayout(namespace, chat_id, bs1[1]['callback'])['buttons']
+# bs3 = getMenuLayout(namespace, chat_id, bs2[0]['callback'])['buttons']
 #
-# pprint(getMenuLayout(namespace, chat_id, bs2[0]['callback']))
+# pprint(getMenuLayout(namespace, chat_id, bs3[0]['callback']))
 #
 # pprint(state)
 
