@@ -92,11 +92,14 @@ def order(bot, update):
 
 
 @checkAuth
-def checkout(bot, update):
+def finalize_order(bot, update):
     chat_id = update.message.chat_id
     if chat_id in orders:
         del orders[chat_id]
         bot.sendMessage(chat_id, text='Proceeding to checkout!')
+        order = db.Key.from_path('Order', chat_id)
+        order.active = False
+        order.put()
     else:
         bot.sendMessage(chat_id, text='No active order!')
 
