@@ -2,7 +2,7 @@
 import requests
 import json
 from pprint import pprint
-from telegram import InlineKeyboardButton
+from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 
 
 def getMenu(namespace):
@@ -194,7 +194,7 @@ def updateChoices(choices, toSelect):
 
 
 def getOptionLayout(item, option_name):
-    pprint(getChoicesJson(item, option_name))
+    # pprint(getChoicesJson(item, option_name))
     choices, opt_ind = getChoicesJson(item, option_name)
     buttons = []
     for i, ch in enumerate(choices):
@@ -262,7 +262,7 @@ def getMenuLayout(namespace, chat_id, callback=None):
 
     if cb_type == 'choice':
         item = state['item']
-        choices, opt_ind = getChoicesJson(item, callback['id'])
+        choices, opt_ind = getChoicesJson(item, state['option'])
         ch_ind = getChoiceIndex(choices, callback['id'])
         item['group_modifiers'][opt_ind]['choices'] = updateChoices(choices, ch_ind)
 
@@ -312,15 +312,18 @@ def getItems(namespace, category):
 
 
 
-# namespace = 'slaviktest'
-# chat_id = 1
-#
-# bs1 = getMenuLayout(namespace, chat_id)['buttons']
+namespace = 'slaviktest'
+chat_id = 1
+
+bs1 = getMenuLayout(namespace, chat_id)['buttons']
 
 
 # pprint(bs1)
-# bs2 = getMenuLayout(namespace, chat_id, bs1[1]['callback'])['buttons']
-# bs3 = getMenuLayout(namespace, chat_id, bs2[0]['callback'])['buttons']
+bs2 = getMenuLayout(namespace, chat_id, bs1[1]['callback'])['buttons']
+bs3 = getMenuLayout(namespace, chat_id, bs2[0]['callback'])['buttons']
+bs4 = getMenuLayout(namespace, chat_id, bs3[0]['callback'])['buttons']
+bs5 = getMenuLayout(namespace, chat_id, bs4[0]['callback'])['buttons']
+pprint(bs5)
 #
 # pprint(getMenuLayout(namespace, chat_id, bs3[0]['callback']))
 #
