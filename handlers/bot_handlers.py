@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 from handlers.message_handler import logger
 from models.Models import *
-from API.main import getMenu
+from API.main import getMenu, getCategories, getItems
+from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 
 orders = {}
 
@@ -24,9 +25,33 @@ def namespace(bot, update):
 def menu(bot, update):
     bot_name = bot.name.replace('@', '')
     data = getBotDataByName(bot_name)
-    menu = getMenu(data['api_namespace'])
+    categories = getCategories(data['api_namespace'])
 
-    bot.sendMessage(update.message.chat_id, text=menu[:30])
+    keyboard = []
+    for i in categories:
+        keyboard.append([InlineKeyboardButton(i, callback_data=i)])
+
+    reply_markup = InlineKeyboardMarkup(keyboard)
+
+    update.message.reply_text('Menu:', reply_markup=reply_markup)
+
+def menu_button(bot, update):
+    query = update.callback_query
+
+    bot_name = bot.name.replace('@', '')
+    data = getBotDataByName(bot_name)
+    items = getItems(data['api_namespace'], query.data)
+
+    keyboard = []
+    for i in items:
+        keyboard.append([InlineKeyboardButton(i, callback_data=i)])
+
+    reply_markup = InlineKeyboardMarkup(keyboard)
+
+    bot.editMessageText(text="Menu:",
+                        chat_id=query.message.chat_id,
+                        message_id=query.message.message_id,
+                        reply_markup=reply_markup)
 
 def help(bot, update):
     bot.sendMessage(update.message.chat_id, text='Help!')
