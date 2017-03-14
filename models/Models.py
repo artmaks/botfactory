@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from google.appengine.ext import ndb
+from google.appengine.ext import ndb, db
 
 
 class Bot(ndb.Model):
@@ -22,6 +22,7 @@ class Order(ndb.Model):
 
 class OrderItem(ndb.Model):
     name = ndb.StringProperty(default='')
+    content = ndb.StringProperty(default='')
     count = ndb.IntegerProperty()
 
 
@@ -29,8 +30,8 @@ class Category(ndb.Model):
     name = ndb.StringProperty(default='')
     description = ndb.StringProperty(default='')
 
-
-class Product(ndb.Model):
-    name = ndb.StringProperty(default='')
-    description = ndb.StringProperty(default='')
-    available = ndb.BooleanProperty(default=True)
+#
+# class Product(ndb.Model):
+#     name = ndb.StringProperty(default='')
+#     description = ndb.StringProperty(default='')
+#     available = ndb.BooleanProperty(default=True)

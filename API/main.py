@@ -2,7 +2,8 @@
 import requests
 import json
 
-def getMenu(namespace):
+
+def get_menu(namespace):
     url = 'http://%s.1.doubleb-automation-production.appspot.com/api/menu' % (namespace)
     res = requests.get(url)
     if (res.ok):
@@ -10,8 +11,9 @@ def getMenu(namespace):
     else:
         return 'Error'
 
-def getCategories(namespace):
-    menu = getMenu(namespace)['menu']
+
+def get_categories(namespace):
+    menu = get_menu(namespace)['menu']
     categories = []
 
     for i in menu:
@@ -19,8 +21,9 @@ def getCategories(namespace):
 
     return categories
 
-def getItems(namespace, category):
-    menu = getMenu(namespace)['menu']
+
+def get_items(namespace, category):
+    menu = get_menu(namespace)['menu']
 
     items = []
     for i in menu:
