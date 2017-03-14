@@ -30,6 +30,11 @@ class Category(ndb.Model):
     name = ndb.StringProperty(default='')
     description = ndb.StringProperty(default='')
 
+
+class Category(ndb.Model):
+    name = ndb.StringProperty(default='')
+    description = ndb.StringProperty(default='')
+
 #
 # class Product(ndb.Model):
 #     name = ndb.StringProperty(default='')
