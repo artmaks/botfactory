@@ -122,11 +122,12 @@ def getCategoryLayout(menu, steps):
 def getCost(item):
     cost = item['price']
 
-    if 'choices' in item['group_modifiers']:
-        opts = item['group_modifiers']['choices']
+    for mod in item['group_modifiers']:
+        opts = mod['choices']
         for opt in opts:
             if opt['default']:
                 cost += opt['price']
+
 
     return cost
 
@@ -229,7 +230,7 @@ def layoutComplement(layout):
 
 def getChoiceIndex(choices, tofind):
     for i, ch in enumerate(choices):
-        if ch['title'] == tofind:
+        if ch['id'] == tofind:
             return i
 
 def getMenuLayout(namespace, chat_id, callback=None):
@@ -264,6 +265,7 @@ def getMenuLayout(namespace, chat_id, callback=None):
         item = state['item']
         choices, opt_ind = getChoicesJson(item, state['option'])
         ch_ind = getChoiceIndex(choices, callback['id'])
+
         item['group_modifiers'][opt_ind]['choices'] = updateChoices(choices, ch_ind)
 
         state['item'] = item
@@ -286,44 +288,17 @@ def getMenuLayout(namespace, chat_id, callback=None):
     return layoutComplement(layout)
 
 
-def getCategories(namespace):
-    menu = getMenu(namespace)['menu']
-    categories = []
-
-    for i in menu:
-        categories.append(i['info']['title'])
-
-    return categories
-
-def getItems(namespace, category):
-    menu = getMenu(namespace)['menu']
-
-    items = []
-    for i in menu:
-        if i['info']['title'] == category:
-            items = i['items']
-            break
-
-    res = []
-    for i in items:
-        res.append(i['title'])
-
-    return res
 
 
+namespace = 'slaviktest'
+chat_id = 1
 
-# namespace = 'slaviktest'
-# chat_id = 1
-#
-# bs1 = getMenuLayout(namespace, chat_id)['buttons']
-#
-#
-# # pprint(bs1)
-# bs2 = getMenuLayout(namespace, chat_id, bs1[1]['callback'])['buttons']
-# bs3 = getMenuLayout(namespace, chat_id, bs2[0]['callback'])['buttons']
-# bs4 = getMenuLayout(namespace, chat_id, bs3[0]['callback'])['buttons']
-# bs5 = getMenuLayout(namespace, chat_id, bs4[0]['callback'])['buttons']
-# pprint(bs5)
+bs1 = getMenuLayout(namespace, chat_id)['buttons']
+bs2 = getMenuLayout(namespace, chat_id, bs1[1]['callback'])['buttons']
+bs3 = getMenuLayout(namespace, chat_id, bs2[0]['callback'])['buttons']
+bs4 = getMenuLayout(namespace, chat_id, bs3[0]['callback'])['buttons']
+bs5 = getMenuLayout(namespace, chat_id, bs4[0]['callback'])['buttons']
+pprint(bs5)
 #
 # pprint(getMenuLayout(namespace, chat_id, bs3[0]['callback']))
 #
