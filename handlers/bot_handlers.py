@@ -2,6 +2,7 @@
 from handlers.message_handler import logger
 from API.main import *
 from models.Models import *
+from API.main import *
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 from utils.register import authStatus, checkAuth, registerNewUser
 from utils.data import getBotDataByName
@@ -43,7 +44,7 @@ def namespace(bot, update):
 def menu(bot, update):
     bot_name = bot.name.replace('@', '')
     data = getBotDataByName(bot_name)
-    categories = get_categories(data['api_namespace'])
+    categories = getCategories(data['api_namespace'])
 
     keyboard = []
     for i in categories:
@@ -57,33 +58,21 @@ def menu(bot, update):
 @checkAuth
 def menu_button(bot, update):
     query = update.callback_query
-    chat_id = update.message.chat_id
 
     bot_name = bot.name.replace('@', '')
     data = getBotDataByName(bot_name)
-    if data['type'] == 'category':
-        items = get_items(data['api_namespace'], query.data)
+    items = getItems(data['api_namespace'], query.data)
 
-        keyboard = []
-        for i in items:
-            keyboard.append([InlineKeyboardButton(i, callback_data=i)])
+    keyboard = []
+    for i in items:
+        keyboard.append([InlineKeyboardButton(i, callback_data=i)])
 
-        reply_markup = InlineKeyboardMarkup(keyboard)
+    reply_markup = InlineKeyboardMarkup(keyboard)
 
-        bot.editMessageText(text="Menu:",
-                            chat_id=query.message.chat_id,
-                            message_id=query.message.message_id,
-                            reply_markup=reply_markup)
-    elif data['type'] == 'item':
-        pass
-    elif data['type'] == 'option':
-        pass
-    elif data['type'] == 'add':
-        item = data['item']
-        order = db.Key.from_path('Order', chat_id)
-        new_item = OrderItem(parent=order, name='name', content=item)
-        new_item.put()
-
+    bot.editMessageText(text="Menu:",
+                        chat_id=query.message.chat_id,
+                        message_id=query.message.message_id,
+                        reply_markup=reply_markup)
 
 
 @checkAuth

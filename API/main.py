@@ -204,8 +204,9 @@ def getOptionLayout(steps, item, option_name):
 
     return {'buttons': buttons}
 
+
 def getMenuLayout(namespace, history):
-    menu = getMenu(namespace)['menu']
+    menu = get_menu(namespace)['menu']
 
     type = history['type']
 
@@ -220,12 +221,15 @@ def getMenuLayout(namespace, history):
         return getOptionLayout(history['steps'], history['item'], history['option'])
 
     if type == 'add':
-        # addToCart(history['item']) # FOR PLATON
+        item = data['item']
+        order = db.Key.from_path('Order', chat_id)
+        new_item = OrderItem(parent=order, name='name', content=item)
+        new_item.put()
         return {'text': 'Added!'}
 
 
 def getCategories(namespace):
-    menu = getMenu(namespace)['menu']
+    menu = get_menu(namespace)['menu']
     categories = []
 
     for i in menu:
@@ -234,7 +238,7 @@ def getCategories(namespace):
     return categories
 
 
-def get_items(namespace, category):
+def getItems(namespace, category):
     menu = get_menu(namespace)['menu']
 
     items = []
