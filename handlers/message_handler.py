@@ -15,7 +15,7 @@ logger = logging.getLogger(__name__)
 from telegram import Bot
 from telegram.ext import Dispatcher, CommandHandler, MessageHandler, Filters, CallbackQueryHandler
 from credentials import TOKEN
-from handlers.bot_handlers import order, checkout, error, help, start, namespace, menu, menu_button
+from handlers.bot_handlers import order, checkout, error, help, start, namespace, menu, menu_button, text_handler
 
 dispatcher = {}
 bot = {}
@@ -37,6 +37,7 @@ def setup(token):
     dispatcher[token].add_handler(CommandHandler("checkout", checkout))
     dispatcher[token].add_handler(CommandHandler("namespace", namespace))
     dispatcher[token].add_handler(CommandHandler("menu", menu))
+    dispatcher[token].add_handler(MessageHandler(Filters.text, text_handler))
     dispatcher[token].add_handler(CallbackQueryHandler(menu_button))
     dispatcher[token].add_error_handler(error)
 
