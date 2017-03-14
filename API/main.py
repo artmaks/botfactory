@@ -160,14 +160,14 @@ def getItemLayout(steps, item):
     cb_add = {}
     cb_add['type'] = 'add'
     b_add = {}
-    b_add['name'] = 'Add to cart'
+    b_add['name'] = 'Добавить в корзину'
     b_add['callback'] = cb_add
     buttons += [b_add]
 
     cb_back = {}
     cb_back['type'] = 'back'
     b_back = {}
-    b_back['name'] = 'Back'
+    b_back['name'] = 'Назад'
     b_back['callback'] = cb_back
     buttons += [b_back]
 
@@ -280,7 +280,7 @@ def getMenuLayout(namespace, chat_id, callback=None):
 
     if cb_type == 'add':
         # addToCart(history['item']) # FOR PLATON
-        layout = {'text': 'Added!'}
+        layout = {'text': 'Товар добавлен в корзину!'}
 
 
     saveState(state)
