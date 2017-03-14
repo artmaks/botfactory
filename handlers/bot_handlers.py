@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from handlers.message_handler import logger
-from API.main import getMenu, getCategories, getItems, getMenuLayout
+from API.main import getMenu, getMenuLayout
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 from utils.register import authStatus, checkAuth, registerNewUser
 from utils.data import getBotDataByName
