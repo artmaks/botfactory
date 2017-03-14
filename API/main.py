@@ -312,24 +312,24 @@ def getItems(namespace, category):
 
 
 #
-namespace = 'slaviktest'
-chat_id = 1
-
-bs1 = getMenuLayout(namespace, chat_id)['buttons']
-
-
-
-for b in bs1:
-    print('\n\n')
-    print(b['callback'])
-    js = json.dumps(b['callback'], encoding='utf-8')
-    print(js)
-    print(InlineKeyboardButton(b['name'], callback_data=js))
-
-pprint(bs1)
-bs2 = getMenuLayout(namespace, chat_id, bs1[0]['callback'])['buttons']
-
-pprint(getMenuLayout(namespace, chat_id, bs2[0]['callback']))
-
-pprint(state)
+# namespace = 'slaviktest'
+# chat_id = 1
+#
+# bs1 = getMenuLayout(namespace, chat_id)['buttons']
+#
+#
+#
+# for b in bs1:
+#     print('\n\n')
+#     print(b['callback'])
+#     js = json.dumps(b['callback'], encoding='utf-8')
+#     print(js)
+#     print(InlineKeyboardButton(b['name'], callback_data=js))
+#
+# pprint(bs1)
+# bs2 = getMenuLayout(namespace, chat_id, bs1[0]['callback'])['buttons']
+#
+# pprint(getMenuLayout(namespace, chat_id, bs2[0]['callback']))
+#
+# pprint(state)
 
