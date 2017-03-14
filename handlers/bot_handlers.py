@@ -7,6 +7,7 @@ from utils.data import getBotDataByName
 
 orders = {}
 
+
 def text_handler(bot, update):
     bot_name = bot.name.replace('@', '')
     data = getBotDataByName(bot_name)
@@ -17,14 +18,15 @@ def text_handler(bot, update):
     if not authStatus(update.message.chat_id):
         bot.sendMessage(chat_id=chat_id, text=u"Добрый день, " + name + u"!")
         user_id = registerNewUser(namespace, name, chat_id)
-        if(user_id != 0):
+        if user_id != 0:
             bot.sendMessage(chat_id=chat_id, text=u"Вы успешно были зарегистрированы в системе, ваш user_id " + str(user_id))
-            return
+    else:
+        bot.sendMessage(chat_id=update.message.chat_id, text="Для просмотра списка комманд введите /help")
 
-    bot.sendMessage(chat_id=update.message.chat_id, text="Для просмотра списка комманд введите /help")
 
 def start(bot, update):
     bot.sendMessage(update.message.chat_id, text='Hi!')
+
 
 #Получить namespace для API бота (в будущем эта функция не нужна)
 def namespace(bot, update):
@@ -32,6 +34,7 @@ def namespace(bot, update):
     data = getBotDataByName(bot_name)
 
     bot.sendMessage(update.message.chat_id, text=data['api_namespace'])
+
 
 #Получить меню
 def menu(bot, update):
@@ -50,6 +53,7 @@ def menu(bot, update):
 
     update.message.reply_text('Menu:', reply_markup=reply_markup)
 
+
 def menu_button(bot, update):
     query = update.callback_query
 
@@ -67,6 +71,7 @@ def menu_button(bot, update):
                         chat_id=query.message.chat_id,
                         message_id=query.message.message_id,
                         reply_markup=reply_markup)
+
 
 def help(bot, update):
     bot.sendMessage(update.message.chat_id, text='Help!')
