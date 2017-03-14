@@ -10,8 +10,12 @@ def authStatus(chat_id):
 
 def checkAuth(func):
     def f(bot, update):
-        if not authStatus(update.message.chat_id):
-            bot.sendMessage(update.message.chat_id, text='Вы не зарегистрированы в системе, пожалуйста представьтесь: ')
+        if update.callback_query:
+            chat_id = update.callback_query.message.chat_id
+        else:
+            chat_id = update.message.chat_id
+        if not authStatus(chat_id):
+            bot.sendMessage(chat_id, text='Вы не зарегистрированы в системе, пожалуйста представьтесь: ')
             return
         else:
             func(bot, update)
