@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
 import requests
 import json
+from google.appengine.ext import ndb, db
 from pprint import pprint
-from
+from models.Models import *
 
 
 def get_menu(namespace):
@@ -231,7 +232,7 @@ def getChoiceIndex(choices, tofind):
             return i
 
 def getMenuLayout(namespace, chat_id, callback=None):
-    menu = getMenu(namespace)['menu']
+    menu = get_menu(namespace)['menu']
     if callback == None:
         callback = {'type': 'category', 'name': None}
 
@@ -275,7 +276,7 @@ def getMenuLayout(namespace, chat_id, callback=None):
         layout = getCategoryLayout(menu, state['steps'])
 
     if cb_type == 'add':
-        item = history['item']
+        item = callback['item']
         order = db.Key.from_path('Order', chat_id)
         new_item = OrderItem(parent=order, name='name', content=item)
         new_item.put()

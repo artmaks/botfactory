@@ -31,9 +31,8 @@ class Category(ndb.Model):
     description = ndb.StringProperty(default='')
 
 
-class Category(ndb.Model):
-    name = ndb.StringProperty(default='')
-    description = ndb.StringProperty(default='')
+class NavigationState(ndb.Model):
+    path = ndb.StringProperty(default='')
 
 #
 # class Product(ndb.Model):
