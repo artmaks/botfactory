@@ -1,9 +1,6 @@
 # -*- coding: utf-8 -*-
 import requests
 import json
-from pprint import pprint
-from telegram import InlineKeyboardButton, InlineKeyboardMarkup
-
 
 def getMenu(namespace):
     url = 'http://%s.1.doubleb-automation-production.appspot.com/api/menu' % (namespace)
@@ -12,15 +9,6 @@ def getMenu(namespace):
         return json.loads(res.content)
     else:
         return 'Error'
-
-
-# def follow_path(menu_json, path=None):
-#     if path == None:
-#         path = '[]'
-#     #jsd = json.JSONDecoder()
-#     steps = json.loads(path)
-#
-#     print steps
 
 state = {'steps': []}
 
@@ -129,9 +117,10 @@ def getCost(item):
                 cost += opt['price']
 
 
-    return cost
+    return cost * item['number']
 
-
+def makeButton(name, callback):
+    return {'name': name, 'callback': callback}
 
 def getItemLayout(steps, item):
     layout = {}
@@ -139,7 +128,7 @@ def getItemLayout(steps, item):
 
     cost = getCost(item)
 
-    layout['text'] = 'Цена: {0}'.format(cost)
+    layout['text'] = '{0} ({1})\nЦена: {2}'.format(item['title'], item['number'], cost)
 
     buttons = []
 
@@ -157,18 +146,26 @@ def getItemLayout(steps, item):
 
             buttons += [b]
 
+    cb_plus = {}
+    cb_plus['type'] = 'count'
+    cb_plus['val'] = 1
+    b_plus = makeButton('+1', cb_plus)
+
+    cb_minus = {}
+    cb_minus['type'] = 'count'
+    cb_minus['val'] = -1
+    b_minus = makeButton('+1', cb_minus)
+
+    buttons += [b_plus, b_minus]
+
     cb_add = {}
     cb_add['type'] = 'add'
-    b_add = {}
-    b_add['name'] = 'Добавить в корзину'
-    b_add['callback'] = cb_add
+    b_add = makeButton('Добавить в корзину', cb_add)
     buttons += [b_add]
 
     cb_back = {}
     cb_back['type'] = 'back'
-    b_back = {}
-    b_back['name'] = 'Назад'
-    b_back['callback'] = cb_back
+    b_back = makeButton('Назад', cb_back)
     buttons += [b_back]
 
     layout['buttons'] = buttons
@@ -253,6 +250,7 @@ def getMenuLayout(namespace, chat_id, callback=None):
         step = {'id': callback['id'], 'type': 'item'}
         state['steps'].append(step)
         item = getItemsBySteps(menu, state['steps'])
+        item['number'] = 1
         layout = getItemLayout(state['steps'], item)
 
         state['item'] = item
@@ -270,6 +268,12 @@ def getMenuLayout(namespace, chat_id, callback=None):
 
         state['item'] = item
         state['choice'] = None
+        layout = getItemLayout(state['steps'], item)
+
+    if cb_type == 'count':
+        item = state['item']
+        newcount = max(1, item['count'])
+        item['count'] = newcount
         layout = getItemLayout(state['steps'], item)
 
     if cb_type == 'back':
