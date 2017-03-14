@@ -6,6 +6,7 @@ from API.main import *
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 from utils.register import authStatus, checkAuth, registerNewUser
 from utils.data import getBotDataByName
+import json
 from google.appengine.ext import ndb, db
 
 orders = {}
@@ -44,11 +45,15 @@ def namespace(bot, update):
 def menu(bot, update):
     bot_name = bot.name.replace('@', '')
     data = getBotDataByName(bot_name)
-    categories = getCategories(data['api_namespace'])
+
+    # categories = getCategories(data['api_namespace'])
+    layout = getMenuLayout(data['api_namespace'], 1)
 
     keyboard = []
-    for i in categories:
-        keyboard.append([InlineKeyboardButton(i, callback_data=i)])
+    for i in layout['buttons']:
+        name = i['name']
+        callback = json.dumps(i['callback'])
+        keyboard.append([InlineKeyboardButton(name, callback_data=callback)])
 
     reply_markup = InlineKeyboardMarkup(keyboard)
 
@@ -61,15 +66,19 @@ def menu_button(bot, update):
 
     bot_name = bot.name.replace('@', '')
     data = getBotDataByName(bot_name)
-    items = getItems(data['api_namespace'], query.data)
+
+    # items = getItems(data['api_namespace'], query.data)
+    layout = getMenuLayout(data['api_namespace'], 1, json.loads(query.data))
 
     keyboard = []
-    for i in items:
-        keyboard.append([InlineKeyboardButton(i, callback_data=i)])
+    for i in layout['buttons']:
+        name = i['name']
+        callback = json.dumps(i['callback'])
+        keyboard.append([InlineKeyboardButton(name, callback_data=callback)])
 
     reply_markup = InlineKeyboardMarkup(keyboard)
 
-    bot.editMessageText(text="Menu:",
+    bot.editMessageText(text="Menu: \n" + (layout['text'] or ''),
                         chat_id=query.message.chat_id,
                         message_id=query.message.message_id,
                         reply_markup=reply_markup)
