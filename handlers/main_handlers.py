@@ -9,7 +9,8 @@ class IndexHandler(BaseHandler):
         bots = [p.to_dict() for p in BotModel.query().fetch()]
         for i in bots:
             i['status'] = 'on' if i['token'] in bot.keys() else 'off'
-        self.render('index.html', {'bots' : bots})
+        self.render('index.html', {'bots': bots})
+
 
 class AddBotHandler(BaseHandler):
     def post(self):
@@ -21,6 +22,7 @@ class AddBotHandler(BaseHandler):
         p = BotModel(name=name, token=token, link=botlink, api_namespace=api_namespace)
         p.put()
         self.response.write('1')
+
 
 class DeleteBotHandler(BaseHandler):
     def post(self):
