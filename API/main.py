@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 import requests
 import json
-from google.appengine.ext import ndb
+# from google.appengine.ext import ndb
 from pprint import pprint
 from utils.data import Item, getMenuStateByChatId, updateMenuStateByChatId
 from utils.data import getOrderStateByChatId, updateOrderStateByChatId
@@ -16,6 +16,26 @@ def get_menu(namespace):
         return 'Error'
 
 # state = {'steps': []}
+
+def makeItemMenuCB():
+    cb = {}
+    cb['chat'] = ITEM_CHAT
+    return cb
+
+def makeEmptyCB(type):
+    cb = makeItemMenuCB()
+    cb['type'] = type
+    return cb
+
+def makeCBWithID(type, id):
+    cb = makeEmptyCB(type)
+    cb['id'] = id
+    return cb
+
+def makeCountCB(val):
+    cb = makeEmptyCB('count')
+    cb['val'] = val
+    return cb
 
 def getStateByChatId(chat_id):
     return json.loads(getMenuStateByChatId(chat_id))
@@ -54,16 +74,12 @@ def list_categories(categories, steps):
     # pprint(categories)
 
     for cat in categories:
-        cb = {}
-        cb['type'] = 'category'
-        cb['id'] = cat['info']['category_id']
-        # pprint([{'name': cat['info']['title'], 'callback': cb}])
-        res += [{'name': cat['info']['title'], 'callback': cb}]
+        cb = makeCBWithID('category', cat['info']['category_id'])
+        res += [makeButton(cat['info']['title'], cb, ITEM_CHAT)]
 
     if len(steps) > 0:
-        cb = {}
-        cb['type'] = 'back'
-        res += [{'name': u'Назад', 'callback': cb}]
+        cb = makeEmptyCB('back')
+        res += [makeButton(u'Назад', cb, ITEM_CHAT)]
 
     return {'buttons': res}
 
@@ -72,15 +88,12 @@ def list_items(items, steps):
     res = []
 
     for i in items:
-        cb = {}
-        cb['type'] = 'item'
-        cb['id'] = i['id']
-        res += [{'name': i['title'], 'callback': cb}]
+        cb = makeCBWithID('item', i['id'])
+        res += [makeButton(i['title'], cb)]
 
     if len(steps) > 0:
-        cb = {}
-        cb['type'] = 'back'
-        res += [{'name': u'Назад', 'callback': cb}]
+        cb = makeEmptyCB('back')
+        res += [makeButton(u'Назад', cb)]
 
     return {'buttons': res}
 
@@ -142,30 +155,20 @@ def getItemLayout(steps, item):
     if len(item['group_modifiers']) > 0:
         opts = item['group_modifiers']
         for opt in opts:
-            b = {}
-            b['name'] = opt['title']
-
-            cb = {}
-            cb['type'] = 'option'
-            cb['id'] = opt['modifier_id']
-            b['callback'] = cb
+            cb = makeCBWithID('option', opt['modifier_id'])
+            b = makeButton(opt['title'], cb)
 
             buttons += [b]
 
-    cb_plus = {}
-    cb_plus['type'] = 'count'
-    cb_plus['val'] = 1
+    cb_plus = makeCountCB(1)
     b_plus = makeButton('+1', cb_plus)
 
-    cb_minus = {}
-    cb_minus['type'] = 'count'
-    cb_minus['val'] = -1
+    cb_minus = makeCountCB(-1)
     b_minus = makeButton('-1', cb_minus)
 
     buttons += [b_plus, b_minus]
 
-    cb_add = {}
-    cb_add['type'] = 'add'
+    cb_add = makeEmptyCB('add')
     b_add = makeButton(u'Добавить в корзину', cb_add)
     buttons += [b_add]
 
@@ -203,15 +206,10 @@ def getOptionLayout(item, option_name):
         cost = ch['price']
         title = ch['title']
         name = u"{0} (+{1})".format(title, cost)
-        #
-        cb = {}
-        # item['group_modifiers'][opt_ind]['choices'] = updateChoices(choices, i)
-        cb['type'] = 'choice'
-        cb['id'] = ch['id']
 
-        button = {}
-        button['name'] = name
-        button['callback'] = cb
+        cb = makeCBWithID('choice', ch['id'])
+
+        button = makeButton(name, cb)
 
         buttons += [button]
 
