@@ -2,6 +2,7 @@
 from handlers.message_handler import logger
 
 from API.main import *
+from API.order_menu import *
 from models.Models import *
 
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup
@@ -45,8 +46,6 @@ def namespace(bot, update):
 def menu(bot, update):
     bot_name = bot.name.replace('@', '')
     data = getBotDataByName(bot_name)
-    new_order = Order(chat_id=str(update.message.chat_id))
-    new_order.put()
 
     resetMenuState(update.message.chat_id, update.message.message_id)
 
@@ -102,12 +101,22 @@ def help(bot, update):
 @checkAuth
 def order(bot, update):
     chat_id = update.message.chat_id
-    if chat_id in orders:
-        bot.sendMessage(chat_id, text='You are already ordering!')
-    else:
-        new_order = Order(key_name=chat_id)
-        new_order.put()
-        bot.sendMessage(chat_id, text='New order started!')
+
+    bot_name = bot.name.replace('@', '')
+    data = getBotDataByName(bot_name)
+
+    layout = getOrderMenuLayout(chat_id)
+
+    keyboard = []
+    for i in layout['buttons']:
+        name = i['name']
+        callback = json.dumps(i['callback'])
+        keyboard.append([InlineKeyboardButton(name, callback_data=callback)])
+
+    reply_markup = InlineKeyboardMarkup(keyboard)
+
+    update.message.reply_text(layout['text'] or '', reply_markup=reply_markup)
+
 
 
 def error(bot, update, error):
