@@ -7,6 +7,10 @@ from utils.data import Item, getMenuStateByChatId, updateMenuStateByChatId
 from utils.data import getOrderStateByChatId, updateOrderStateByChatId
 from API.api_utils import *
 
+import sys
+reload(sys)
+sys.setdefaultencoding('utf8')
+
 def get_menu(namespace):
     url = 'http://%s.1.doubleb-automation-production.appspot.com/api/menu' % (namespace)
     res = requests.get(url)
@@ -179,7 +183,7 @@ def getItemLayout(steps, item):
 
     layout['buttons'] = buttons
 
-    return layout #sdgs
+    return layout
 
 def getChoicesJson(item, option_name):
     modifiers = item['group_modifiers']
@@ -222,6 +226,34 @@ def getChoiceIndex(choices, tofind):
     for i, ch in enumerate(choices):
         if ch['id'] == tofind:
             return i
+
+def constructItemId(item):
+    id = str(item['id'])
+    opts = item['group_modifiers']
+    for opt in opts:
+        choices = opt['choices']
+        for ch in choices:
+            if ch['default']:
+                id += '#{0}'.format(ch['id'])
+    return id
+
+def constructName(item):
+    name = item['title']
+
+    mods = []
+
+    opts = item['group_modifiers']
+    for opt in opts:
+        choices = opt['choices']
+        for ch in choices:
+            if ch['default']:
+                mods.append(unicode(ch['title']))
+
+    if len(mods) > 0:
+        m_string = ' ({0})'.format(', '.join(mods))
+        name += m_string
+    return name
+
 
 def getMenuLayout(namespace, chat_id, callback=None):
     menu = get_menu(namespace)['menu']
@@ -281,8 +313,8 @@ def getMenuLayout(namespace, chat_id, callback=None):
         # addToCart(history['item']) # FOR PLATON
         order = getOrderStateByChatId(chat_id)
         item_dict = state['item']
-        item_id = item_dict['id']
-        item_name = item_dict['title']
+        item_id = constructItemId(item_dict)
+        item_name = constructName(item_dict)
         item_count = item_dict['count']
         item_price = getPrice(item_dict)
         if item_id in order:
@@ -304,9 +336,14 @@ def getMenuLayout(namespace, chat_id, callback=None):
 
 
 
-#
+
 # namespace = 'slaviktest'
 # chat_id = 1
+#
+# item = get_menu(namespace)['menu'][1]['items'][0]
+#
+# print(constructName(item))
+
 #
 # bs1 = getMenuLayout(namespace, chat_id)['buttons']
 # bs2 = getMenuLayout(namespace, chat_id, bs1[1]['callback'])['buttons']
