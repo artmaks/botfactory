@@ -29,11 +29,10 @@ def get_menu(namespace):
 state = {'steps': []}
 
 def getStateByChatId(chat_id):
-    return state
+    return json.loads(getMenuStateByChatId(chat_id))
 
-def saveState(st):
-    global state
-    state = st
+def saveState(chat_id, st):
+    updateMenuStateByChatId(chat_id, st)
 
 def make_step_cat(catlist, c_id):
     for entry in catlist:
@@ -288,7 +287,7 @@ def getMenuLayout(namespace, chat_id, callback=None):
         layout = {'text': 'Added!'}
 
 
-    saveState(state)
+    saveState(chat_id, state)
     # pprint(layout)
     return layoutComplement(layout)
 
