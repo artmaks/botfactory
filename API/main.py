@@ -287,11 +287,15 @@ def getMenuLayout(namespace, chat_id, callback=None):
         item_name = item_dict['title']
         item_count = item_dict['count']
         item_price = getPrice(item_dict)
-        item = Item(item_id,
+        if item_id in order:
+            order[item_id].count += item_count
+        else:
+            item = Item(item_id,
                     item_name,
                     item_count,
                     item_price)
-        order[item_id] = item
+            order[item_id] = item
+
         updateOrderStateByChatId(chat_id, order)
         layout = {'text': u'Товар добавлен в корзину!'}
 
