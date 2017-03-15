@@ -35,6 +35,7 @@ class Category(ndb.Model):
 class NavigationState(ndb.Model):
     chat_id = ndb.StringProperty(default='')
     state = ndb.StringProperty(default='')
+    message_id = ndb.IntegerProperty(default='')
 
 #
 # class Product(ndb.Model):
