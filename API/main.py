@@ -75,11 +75,11 @@ def list_categories(categories, steps):
 
     for cat in categories:
         cb = makeCBWithID('category', cat['info']['category_id'])
-        res += [makeButton(cat['info']['title'], cb, ITEM_CHAT)]
+        res += [makeButton(cat['info']['title'], cb)]
 
     if len(steps) > 0:
         cb = makeEmptyCB('back')
-        res += [makeButton(u'Назад', cb, ITEM_CHAT)]
+        res += [makeButton(u'Назад', cb)]
 
     return {'buttons': res}
 
@@ -223,9 +223,9 @@ def getChoiceIndex(choices, tofind):
 
 
 def getContinueOrderLayout():
-    cb_continue = {'type': 'continue_order', 'chat': 'i'}
+    cb_continue = makeEmptyCB('continue_order')
     button_continue = {'name': 'Continue order', 'callback': cb_continue}
-    cb_checkout = {'type': 'end_order', 'chat': 'o'}
+    cb_checkout = makeEmptyCB('main')
     button_checkout = {'name': 'Checkout', 'callback': cb_checkout}
 
     return {'text': u'Товар добавлен в корзину!', 'buttons': [button_continue, button_checkout]}
@@ -305,9 +305,6 @@ def getMenuLayout(namespace, chat_id, callback=None):
 
     elif cb_type == 'continue_order':
         layout = getMenuLayout(namespace, chat_id)
-
-    elif cb_type == 'end_order':
-        layout = {'text': u'Чекаутимся!'}
 
     saveState(chat_id, state)
 
