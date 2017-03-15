@@ -19,14 +19,6 @@ class Item:
     def __str__(self):
         return unicode(u"{0} (x{1}) - {2}руб.".format(self.name, self.count, self.count * self.price))
 
-order_state = 0
-
-def getOrderState(chat_id):
-    return order_state
-
-def saveOrderState(chat_id, state):
-    global order_state
-    order_state = state
 
 
 order = {0: Item(0, u'Американо', 1, 120),
