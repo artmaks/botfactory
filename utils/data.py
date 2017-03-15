@@ -44,14 +44,15 @@ def updateMenuStateByChatId(chat_id, new_state):
         state_entity.put()
 
 #======= Orders state ======
-
 def orderDictToOrder(order_dict):
     order = {i: Item.from_dict(order_dict[i]) for i in order_dict}
     return order
 
+
 def orderToOrderDict(order):
     order_dict = {i: order[i].to_dict() for i in order}
     return order_dict
+
 
 def getOrderStateByChatId(chat_id):
     state = [p.to_dict() for p in OrderState.query(OrderState.chat_id == str(chat_id)).fetch()]
@@ -61,6 +62,7 @@ def getOrderStateByChatId(chat_id):
     state_items = orderDictToOrder(json.loads(state[0]['state']))
     return state_items
 
+
 def updateOrderStateByChatId(chat_id, new_state):
     new_state_dicts = orderToOrderDict(new_state)
     json_state = json.dumps(new_state_dicts)
@@ -69,7 +71,7 @@ def updateOrderStateByChatId(chat_id, new_state):
         for l in state:
             l.key.delete()
 
-        state_entity = OrderState(chat_id = str(chat_id), state = json_state)
+        state_entity = OrderState(chat_id=str(chat_id), state=json_state)
         state_entity.put()
     else:
         state_entity = state[0].key.get()
