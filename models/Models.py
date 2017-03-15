@@ -17,6 +17,7 @@ class Users(ndb.Model):
 
 class Order(ndb.Model):
     name = ndb.StringProperty(default='')
+    chat_id = ndb.StringProperty(default='')
     active = ndb.BooleanProperty(default=True)
 
 
