@@ -38,37 +38,42 @@ def removeItem(item, chat_id):
 
 # callback['type'] = 'main' | 'proc'(proceed) | 'clear' | 'edit' | 'item' | 'count' | 'remove'
 
-def makeMainCB():
+def makeOrderCB():
     cb = {}
+    cb['chat'] = ORDER_CHAT
+    return cb
+
+def makeMainCB():
+    cb = makeOrderCB()
     cb['type'] = 'main'
     return cb
 
 def makeProcCB():
-    cb = {}
+    cb = makeOrderCB()
     cb['type'] = 'proc'
     return cb
 
 def makeClearCB():
-    cb = {}
+    cb = makeOrderCB()
     cb['type'] = 'clear'
     return cb
 
 
 def makeEditCB():
-    cb = {}
+    cb = makeOrderCB()
     cb['type'] = 'edit'
     return cb
 
 
 def makeItemCB(item_id):
-    cb = {}
+    cb = makeOrderCB()
     cb['type'] = 'item'
     cb['id'] = item_id
     return cb
 
 
 def makeCountCB(val, item_id):
-    cb = {}
+    cb = makeOrderCB()
     cb['type'] = 'count'
     cb['val'] = val
     cb['item_id'] = item_id
@@ -76,14 +81,13 @@ def makeCountCB(val, item_id):
 
 
 def makeRemoveCB(item_id):
-    cb = {}
+    cb = makeOrderCB()
     cb['type'] = 'remove'
     cb['item_id'] = item_id
     return cb
 
 def emptyOrderLayout():
     layout = {}
-
     layout['buttons'] = []
     layout['text'] = u"Ваш заказ пуст. Добавьте в него что-нибудь с помощью команды /menu! :)"
 
@@ -145,7 +149,7 @@ def getEditLayout(chat_id):
         if order[id].count == 0:
             order.pop(id)
 
-    saveOrderState(chat_id, order)
+    saveOrder(chat_id, order)
 
     layout = {}
     buttons = []
