@@ -13,10 +13,10 @@ def getMenu(namespace):
 
 state = {'steps': []}
 
-def getStateByChatId(chat_id):
+def getProductStateByChatId(chat_id):
     return state
 
-def saveState(st):
+def saveProductState(st, chat_id):
     global state
     state = st
 
@@ -237,7 +237,7 @@ def getMenuLayout(namespace, chat_id, callback=None):
         callback = {'type': 'category', 'id': None}
 
     cb_type = callback['type']
-    state = getStateByChatId(chat_id)
+    state = getProductStateByChatId(chat_id)
 
     if cb_type == 'category':
         steps = state['steps']
@@ -247,7 +247,7 @@ def getMenuLayout(namespace, chat_id, callback=None):
         layout =  getCategoryLayout(menu, steps)
 
 
-    if cb_type == 'item':
+    elif cb_type == 'item':
         step = {'id': callback['id'], 'type': 'item'}
         state['steps'].append(step)
         item = getItemsBySteps(menu, state['steps'])
@@ -256,11 +256,11 @@ def getMenuLayout(namespace, chat_id, callback=None):
 
         state['item'] = item
 
-    if cb_type == 'option':
+    elif cb_type == 'option':
         state['option'] = callback['id']
         layout = getOptionLayout(state['item'], state['option'])
 
-    if cb_type == 'choice':
+    elif cb_type == 'choice':
         item = state['item']
         choices, opt_ind = getChoicesJson(item, state['option'])
         ch_ind = getChoiceIndex(choices, callback['id'])
@@ -271,24 +271,24 @@ def getMenuLayout(namespace, chat_id, callback=None):
         state['choice'] = None
         layout = getItemLayout(state['steps'], item)
 
-    if cb_type == 'count':
+    elif cb_type == 'count':
         item = state['item']
         newcount = max(1, item['count'] + callback['val'])
         item['count'] = newcount
         layout = getItemLayout(state['steps'], item)
 
-    if cb_type == 'back':
+    elif cb_type == 'back':
         state['steps'] = state['steps'][:-1]
         state['item'] = None
 
         layout = getCategoryLayout(menu, state['steps'])
 
-    if cb_type == 'add':
+    elif cb_type == 'add':
         # addToCart(history['item']) # FOR PLATON
         layout = {'text': u'Товар добавлен в корзину!'}
 
 
-    saveState(state)
+    saveProductState(state)
     # pprint(layout)
     return layoutComplement(layout)
 
