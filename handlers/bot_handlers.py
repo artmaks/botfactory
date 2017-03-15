@@ -48,7 +48,8 @@ def menu(bot, update):
     new_order = Order(chat_id=str(update.message.chat_id))
     new_order.put()
 
-    # categories = getCategories(data['api_namespace'])
+    resetMenuState(update.message.chat_id, update.message.message_id)
+
     layout = getMenuLayout(data['api_namespace'], update.message.chat_id)
 
     keyboard = []
@@ -69,6 +70,13 @@ def menu_button(bot, update):
     bot_name = bot.name.replace('@', '')
     data = getBotDataByName(bot_name)
 
+    # Если id сообщения отличается не больше чем на 1, так как в телеграме сообщения дублируются
+    if(query.message.message_id - 1 != getCurrentMenuMessage(query.message.chat_id)):
+        bot.editMessageText(text="Воспользуйтесь последним открытым меню",
+            chat_id=query.message.chat_id,
+            message_id=query.message.message_id)
+        return
+
     # items = getItems(data['api_namespace'], query.data)
     layout = getMenuLayout(data['api_namespace'], query.message.chat_id, json.loads(query.data))
 
@@ -80,7 +88,7 @@ def menu_button(bot, update):
 
     reply_markup = InlineKeyboardMarkup(keyboard)
 
-    bot.editMessageText(text="Menu: \n" + (layout['text'] or ''),
+    bot.editMessageText(text="Menu: \n " + (layout['text'] or ''),
                         chat_id=query.message.chat_id,
                         message_id=query.message.message_id,
                         reply_markup=reply_markup)

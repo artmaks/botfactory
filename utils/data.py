@@ -13,6 +13,20 @@ def getOrderByChatId(chat_id):
     orders = [p.to_dict() for p in Order.query(Order.chat_id == str(chat_id) and Order.active == True).fetch()]
     return orders[0]
 
+def resetMenuState(chat_id, message_id):
+    all_states = NavigationState.query(NavigationState.chat_id == str(chat_id)).fetch()
+
+    for l in all_states:
+        l.key.delete()
+
+    state_entity = NavigationState(chat_id=str(chat_id), state='{"steps": []}', message_id = message_id)
+    state_entity.put()
+
+
+def getCurrentMenuMessage(chat_id):
+    state = [p.to_dict() for p in NavigationState.query(NavigationState.chat_id == str(chat_id)).fetch()]
+    return state[0]['message_id'] if len(state) > 0 else None
+
 def getMenuStateByChatId(chat_id):
     state = [p.to_dict() for p in NavigationState.query(NavigationState.chat_id == str(chat_id)).fetch()]
     return state[0]['state'] if len(state) > 0 else '{"steps": []}'
