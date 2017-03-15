@@ -3,48 +3,32 @@ from pprint import pprint
 from API.main import makeButton, layoutComplement
 # encoding=utf8
 import sys
+from API.api_utils import *
+from utils.data import Item, getOrderStateByChatId, updateOrderStateByChatId
+
 
 reload(sys)
 sys.setdefaultencoding('utf8')
 # ======================= STUBS FOR LOGIC TESTING ==========================
 
-# Stub class to be replaced by model in Models.py
-class Item:
-    def __init__(self, id=0, name=u"Маффин", count=1, price=120):
-        self.id = id
-        self.name = name
-        self.count = count
-        self.price = price
-
-    def __str__(self):
-        return unicode(u"{0} (x{1}) - {2}руб.".format(self.name, self.count, self.count * self.price))
-
-
-
-order = {0: Item(0, u'Американо', 1, 120),
-            1: Item(1, u'Маффин', 2, 100)}
+# Stub class to be replaced by model in Models.p
 
 def loadOrder(chat_id):
-    # TODO: implement loading of all items in order (Platon)
-    return  order
+    return getOrderStateByChatId(chat_id)
 
 def saveOrder(chat_id, order_state):
-    global order
-    order = order_state
+    updateOrderStateByChatId(chat_id, order_state)
 
 def clearOrder(chat_id):
-    # TODO: implement emptying order (Platon)
     order = {}
     saveOrder(chat_id, order)
 
 def updateItem(item, chat_id):
-    # TODO: implement updating item in order order (Platon)
     order = loadOrder(chat_id)
     order[item.id] = item
     saveOrder(chat_id, order)
 
 def removeItem(item, chat_id):
-    # TODO: implement removing item from order (Platon)
     order = loadOrder(chat_id)
     order.pop(item.id)
     saveOrder(chat_id, order)
