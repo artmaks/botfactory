@@ -1,6 +1,9 @@
 # -*- coding: utf-8 -*-
 
-def makeButton(name, callback):
+ITEM_CHAT = 'i'
+ORDER_CHAT = 'o'
+
+def makeButton(name, callback, chat):
     return {'name': name, 'callback': callback}
 
 def layoutComplement(layout):
