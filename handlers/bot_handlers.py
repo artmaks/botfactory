@@ -49,7 +49,7 @@ def menu(bot, update):
     new_order.put()
 
     # categories = getCategories(data['api_namespace'])
-    layout = getMenuLayout(data['api_namespace'], 1)
+    layout = getMenuLayout(data['api_namespace'], update.message.chat_id)
 
     keyboard = []
     for i in layout['buttons']:

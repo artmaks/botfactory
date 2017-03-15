@@ -33,7 +33,8 @@ class Category(ndb.Model):
 
 
 class NavigationState(ndb.Model):
-    path = ndb.StringProperty(default='')
+    chat_id = ndb.StringProperty(default='')
+    state = ndb.StringProperty(default='')
 
 #
 # class Product(ndb.Model):
