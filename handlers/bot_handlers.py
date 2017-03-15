@@ -12,7 +12,6 @@ from google.appengine.ext import ndb
 
 orders = {}
 
-
 def text_handler(bot, update):
     bot_name = bot.name.replace('@', '')
     data = getBotDataByName(bot_name)
@@ -109,18 +108,6 @@ def order(bot, update):
         new_order = Order(key_name=chat_id)
         new_order.put()
         bot.sendMessage(chat_id, text='New order started!')
-
-
-@checkAuth
-def finalize_order(bot, update):
-    chat_id = update.message.chat_id
-    if chat_id in orders:
-        del orders[chat_id]
-        bot.sendMessage(chat_id, text='Proceeding to checkout!')
-        order = getOrderByChatId(chat_id)
-        order.put()
-    else:
-        bot.sendMessage(chat_id, text='No active order!')
 
 
 def error(bot, update, error):
