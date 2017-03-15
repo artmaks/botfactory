@@ -6,6 +6,7 @@ from pprint import pprint
 from models.Models import *
 from telegram import InlineKeyboardButton
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup
+from utils.data import *
 
 
 def get_menu(namespace):
@@ -281,8 +282,8 @@ def getMenuLayout(namespace, chat_id, callback=None):
 
     if cb_type == 'add':
         item = state['item']
-        order = ndb.Key.from_path('Order', chat_id)
-        new_item = OrderItem(parent=order, name='name', content=item)
+        order = getOrderByChatId(chat_id)
+        new_item = OrderItem(parent=order.key, name='name', content="asd", count=1)
         new_item.put()
         layout = {'text': 'Added!'}
 

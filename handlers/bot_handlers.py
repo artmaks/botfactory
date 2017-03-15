@@ -5,9 +5,9 @@ from models.Models import *
 from API.main import *
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 from utils.register import authStatus, checkAuth, registerNewUser
-from utils.data import getBotDataByName
+from utils.data import *
 import json
-from google.appengine.ext import ndb, db
+from google.appengine.ext import ndb
 
 orders = {}
 
@@ -45,6 +45,8 @@ def namespace(bot, update):
 def menu(bot, update):
     bot_name = bot.name.replace('@', '')
     data = getBotDataByName(bot_name)
+    new_order = Order(chat_id=str(update.message.chat_id))
+    new_order.put()
 
     # categories = getCategories(data['api_namespace'])
     layout = getMenuLayout(data['api_namespace'], 1)
@@ -68,7 +70,7 @@ def menu_button(bot, update):
     data = getBotDataByName(bot_name)
 
     # items = getItems(data['api_namespace'], query.data)
-    layout = getMenuLayout(data['api_namespace'], 1, json.loads(query.data))
+    layout = getMenuLayout(data['api_namespace'], query.message.chat_id, json.loads(query.data))
 
     keyboard = []
     for i in layout['buttons']:
@@ -106,8 +108,7 @@ def finalize_order(bot, update):
     if chat_id in orders:
         del orders[chat_id]
         bot.sendMessage(chat_id, text='Proceeding to checkout!')
-        order = ndb.Key.from_path('Order', chat_id)
-        order.active = False
+        order = getOrderByChatId(chat_id)
         order.put()
     else:
         bot.sendMessage(chat_id, text='No active order!')
