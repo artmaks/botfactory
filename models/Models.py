@@ -32,6 +32,10 @@ class Category(ndb.Model):
     description = ndb.StringProperty(default='')
 
 
+class OrderState(ndb.model):
+    chat_id = ndb.StringProperty(default='')
+    state = ndb.StringProperty(default='')
+
 class NavigationState(ndb.Model):
     chat_id = ndb.StringProperty(default='')
     state = ndb.StringProperty(default='')
