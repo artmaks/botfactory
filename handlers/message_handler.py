@@ -33,7 +33,7 @@ def setup(token):
     # ---Register handlers here---
     dispatcher[token].add_handler(CommandHandler("start", start))
     dispatcher[token].add_handler(CommandHandler("help", help))
-    dispatcher[token].add_handler(CommandHandler("order", order))
+    # dispatcher[token].add_handler(CommandHandler("order", order))
     dispatcher[token].add_handler(CommandHandler("namespace", namespace))
     dispatcher[token].add_handler(CommandHandler("menu", menu))
     dispatcher[token].add_handler(MessageHandler(Filters.text, text_handler))
