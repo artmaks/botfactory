@@ -179,7 +179,7 @@ def getItemLayout(steps, item):
 
     layout['buttons'] = buttons
 
-    return layout
+    return layout #sdgs
 
 def getChoicesJson(item, option_name):
     modifiers = item['group_modifiers']
