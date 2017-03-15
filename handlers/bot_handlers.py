@@ -1,13 +1,16 @@
 # -*- coding: utf-8 -*-
 from handlers.message_handler import logger
-from API.main import getMenu, getMenuLayout
+
+from API.main import *
+from models.Models import *
+
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 from utils.register import authStatus, checkAuth, registerNewUser
-from utils.data import getBotDataByName
+from utils.data import *
 import json
+from google.appengine.ext import ndb
 
 orders = {}
-
 
 def text_handler(bot, update):
     bot_name = bot.name.replace('@', '')
@@ -42,9 +45,12 @@ def namespace(bot, update):
 def menu(bot, update):
     bot_name = bot.name.replace('@', '')
     data = getBotDataByName(bot_name)
+    new_order = Order(chat_id=str(update.message.chat_id))
+    new_order.put()
 
-    # categories = getCategories(data['api_namespace'])
-    layout = getMenuLayout(data['api_namespace'], 1)
+    resetMenuState(update.message.chat_id, update.message.message_id)
+
+    layout = getMenuLayout(data['api_namespace'], update.message.chat_id)
 
     keyboard = []
     for i in layout['buttons']:
@@ -64,8 +70,15 @@ def menu_button(bot, update):
     bot_name = bot.name.replace('@', '')
     data = getBotDataByName(bot_name)
 
+    # Если id сообщения отличается не больше чем на 1, так как в телеграме сообщения дублируются
+    if(query.message.message_id - 1 != getCurrentMenuMessage(query.message.chat_id)):
+        bot.editMessageText(text="Воспользуйтесь последним открытым меню",
+            chat_id=query.message.chat_id,
+            message_id=query.message.message_id)
+        return
+
     # items = getItems(data['api_namespace'], query.data)
-    layout = getMenuLayout(data['api_namespace'], 1, json.loads(query.data))
+    layout = getMenuLayout(data['api_namespace'], query.message.chat_id, json.loads(query.data))
 
     keyboard = []
     for i in layout['buttons']:
@@ -75,7 +88,7 @@ def menu_button(bot, update):
 
     reply_markup = InlineKeyboardMarkup(keyboard)
 
-    bot.editMessageText(text="Menu: \n" + (layout['text'] or ''),
+    bot.editMessageText(text="Menu: \n " + (layout['text'] or ''),
                         chat_id=query.message.chat_id,
                         message_id=query.message.message_id,
                         reply_markup=reply_markup)
@@ -92,18 +105,9 @@ def order(bot, update):
     if chat_id in orders:
         bot.sendMessage(chat_id, text='You are already ordering!')
     else:
-        orders[chat_id] = "order"
+        new_order = Order(key_name=chat_id)
+        new_order.put()
         bot.sendMessage(chat_id, text='New order started!')
-
-
-@checkAuth
-def checkout(bot, update):
-    chat_id = update.message.chat_id
-    if chat_id in orders:
-        del orders[chat_id]
-        bot.sendMessage(chat_id, text='Proceeding to checkout!')
-    else:
-        bot.sendMessage(chat_id, text='No active order!')
 
 
 def error(bot, update, error):
