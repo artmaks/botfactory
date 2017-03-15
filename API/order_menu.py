@@ -28,7 +28,7 @@ def loadOrder(chat_id):
     # TODO: implement loading of all items in order (Platon)
     return  order
 
-def saveOrder(chat_id, orded_state):
+def saveOrder(chat_id, order_state):
     global order
     order = order_state
 
