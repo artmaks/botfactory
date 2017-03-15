@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import requests
 import json
+from pprint import pprint
 
 def getMenu(namespace):
     url = 'http://%s.1.doubleb-automation-production.appspot.com/api/menu' % (namespace)
@@ -117,7 +118,7 @@ def getCost(item):
                 cost += opt['price']
 
 
-    return cost * item['number']
+    return cost * item[u'count']
 
 def makeButton(name, callback):
     return {'name': name, 'callback': callback}
@@ -128,7 +129,7 @@ def getItemLayout(steps, item):
 
     cost = getCost(item)
 
-    layout['text'] = '{0} ({1})\nЦена: {2}'.format(item['title'], item['number'], cost)
+    layout['text'] = u'{0} ({1})\nЦена: {2}'.format(item['title'], item['count'], cost)
 
     buttons = []
 
@@ -160,12 +161,12 @@ def getItemLayout(steps, item):
 
     cb_add = {}
     cb_add['type'] = 'add'
-    b_add = makeButton('Добавить в корзину', cb_add)
+    b_add = makeButton(u'Добавить в корзину', cb_add)
     buttons += [b_add]
 
     cb_back = {}
     cb_back['type'] = 'back'
-    b_back = makeButton('Назад', cb_back)
+    b_back = makeButton(u'Назад', cb_back)
     buttons += [b_back]
 
     layout['buttons'] = buttons
@@ -250,7 +251,7 @@ def getMenuLayout(namespace, chat_id, callback=None):
         step = {'id': callback['id'], 'type': 'item'}
         state['steps'].append(step)
         item = getItemsBySteps(menu, state['steps'])
-        item['number'] = 1
+        item[u'count'] = 1
         layout = getItemLayout(state['steps'], item)
 
         state['item'] = item
@@ -272,7 +273,7 @@ def getMenuLayout(namespace, chat_id, callback=None):
 
     if cb_type == 'count':
         item = state['item']
-        newcount = max(1, item['count'])
+        newcount = max(1, item['count'] + callback['val'])
         item['count'] = newcount
         layout = getItemLayout(state['steps'], item)
 
@@ -284,7 +285,7 @@ def getMenuLayout(namespace, chat_id, callback=None):
 
     if cb_type == 'add':
         # addToCart(history['item']) # FOR PLATON
-        layout = {'text': 'Товар добавлен в корзину!'}
+        layout = {'text': u'Товар добавлен в корзину!'}
 
 
     saveState(state)
@@ -293,16 +294,19 @@ def getMenuLayout(namespace, chat_id, callback=None):
 
 
 
-
+#
 # namespace = 'slaviktest'
 # chat_id = 1
 #
 # bs1 = getMenuLayout(namespace, chat_id)['buttons']
 # bs2 = getMenuLayout(namespace, chat_id, bs1[1]['callback'])['buttons']
 # bs3 = getMenuLayout(namespace, chat_id, bs2[0]['callback'])['buttons']
-# bs4 = getMenuLayout(namespace, chat_id, bs3[0]['callback'])['buttons']
-# bs5 = getMenuLayout(namespace, chat_id, bs4[0]['callback'])['buttons']
-# pprint(bs5)
+# bs4 = getMenuLayout(namespace, chat_id, bs3[1]['callback'])['buttons']
+# bs5 = getMenuLayout(namespace, chat_id, bs4[1]['callback'])['buttons']
+
+# pprint(bs3[1])
+#
+# pprint(getMenuLayout(namespace, chat_id, bs4[1]['callback']))
 #
 # pprint(getMenuLayout(namespace, chat_id, bs3[0]['callback']))
 #
