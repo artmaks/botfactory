@@ -3,11 +3,6 @@ import requests
 import json
 from google.appengine.ext import ndb
 from pprint import pprint
-from models.Models import *
-from telegram import InlineKeyboardButton
-from telegram import InlineKeyboardButton, InlineKeyboardMarkup
-from utils.data import *
-
 
 def get_menu(namespace):
     url = 'http://%s.1.doubleb-automation-production.appspot.com/api/menu' % (namespace)
@@ -16,15 +11,6 @@ def get_menu(namespace):
         return json.loads(res.content)
     else:
         return 'Error'
-
-
-# def follow_path(menu_json, path=None):
-#     if path == None:
-#         path = '[]'
-#     #jsd = json.JSONDecoder()
-#     steps = json.loads(path)
-#
-#     print steps
 
 state = {'steps': []}
 
@@ -125,15 +111,17 @@ def getCategoryLayout(menu, steps):
 def getCost(item):
     cost = item['price']
 
-    if 'choices' in item['group_modifiers']:
-        opts = item['group_modifiers']['choices']
+    for mod in item['group_modifiers']:
+        opts = mod['choices']
         for opt in opts:
             if opt['default']:
                 cost += opt['price']
 
-    return cost
 
+    return cost * item[u'count']
 
+def makeButton(name, callback):
+    return {'name': name, 'callback': callback}
 
 def getItemLayout(steps, item):
     layout = {}
@@ -141,7 +129,7 @@ def getItemLayout(steps, item):
 
     cost = getCost(item)
 
-    layout['text'] = 'Цена: {0}'.format(cost)
+    layout['text'] = u'{0} ({1})\nЦена: {2}'.format(item['title'], item['count'], cost)
 
     buttons = []
 
@@ -159,18 +147,26 @@ def getItemLayout(steps, item):
 
             buttons += [b]
 
+    cb_plus = {}
+    cb_plus['type'] = 'count'
+    cb_plus['val'] = 1
+    b_plus = makeButton('+1', cb_plus)
+
+    cb_minus = {}
+    cb_minus['type'] = 'count'
+    cb_minus['val'] = -1
+    b_minus = makeButton('-1', cb_minus)
+
+    buttons += [b_plus, b_minus]
+
     cb_add = {}
     cb_add['type'] = 'add'
-    b_add = {}
-    b_add['name'] = 'Add to cart'
-    b_add['callback'] = cb_add
+    b_add = makeButton(u'Добавить в корзину', cb_add)
     buttons += [b_add]
 
     cb_back = {}
     cb_back['type'] = 'back'
-    b_back = {}
-    b_back['name'] = 'Back'
-    b_back['callback'] = cb_back
+    b_back = makeButton(u'Назад', cb_back)
     buttons += [b_back]
 
     layout['buttons'] = buttons
@@ -232,7 +228,7 @@ def layoutComplement(layout):
 
 def getChoiceIndex(choices, tofind):
     for i, ch in enumerate(choices):
-        if ch['title'] == tofind:
+        if ch['id'] == tofind:
             return i
 
 def getMenuLayout(namespace, chat_id, callback=None):
@@ -241,7 +237,7 @@ def getMenuLayout(namespace, chat_id, callback=None):
         callback = {'type': 'category', 'id': None}
 
     cb_type = callback['type']
-    state = getStateByChatId(chat_id)
+    state = getProductStateByChatId(chat_id)
 
     if cb_type == 'category':
         steps = state['steps']
@@ -251,86 +247,66 @@ def getMenuLayout(namespace, chat_id, callback=None):
         layout =  getCategoryLayout(menu, steps)
 
 
-    if cb_type == 'item':
+    elif cb_type == 'item':
         step = {'id': callback['id'], 'type': 'item'}
         state['steps'].append(step)
         item = getItemsBySteps(menu, state['steps'])
+        item[u'count'] = 1
         layout = getItemLayout(state['steps'], item)
 
         state['item'] = item
 
-    if cb_type == 'option':
+    elif cb_type == 'option':
         state['option'] = callback['id']
         layout = getOptionLayout(state['item'], state['option'])
 
-    if cb_type == 'choice':
+    elif cb_type == 'choice':
         item = state['item']
         choices, opt_ind = getChoicesJson(item, state['option'])
         ch_ind = getChoiceIndex(choices, callback['id'])
+
         item['group_modifiers'][opt_ind]['choices'] = updateChoices(choices, ch_ind)
 
         state['item'] = item
         state['choice'] = None
         layout = getItemLayout(state['steps'], item)
 
-    if cb_type == 'back':
+    elif cb_type == 'count':
+        item = state['item']
+        newcount = max(1, item['count'] + callback['val'])
+        item['count'] = newcount
+        layout = getItemLayout(state['steps'], item)
+
+    elif cb_type == 'back':
         state['steps'] = state['steps'][:-1]
         state['item'] = None
 
         layout = getCategoryLayout(menu, state['steps'])
 
-    if cb_type == 'add':
-        item = state['item']
-        order = getOrderByChatId(chat_id)
-        new_item = OrderItem(parent=order.key, name='name', content="asd", count=1)
-        new_item.put()
-        layout = {'text': 'Added!'}
 
+    elif cb_type == 'add':
+        # addToCart(history['item']) # FOR PLATON
+        layout = {'text': u'Товар добавлен в корзину!'}
 
-    saveState(chat_id, state)
+    saveProductState(state)
+
     # pprint(layout)
     return layoutComplement(layout)
 
 
-def getCategories(namespace):
-    menu = get_menu(namespace)['menu']
-    categories = []
-
-    for i in menu:
-        categories.append(i['info']['title'])
-
-    return categories
-
-
-def getItems(namespace, category):
-    menu = get_menu(namespace)['menu']
-
-    items = []
-    for i in menu:
-        if i['info']['title'] == category:
-            items = i['items']
-            break
-
-    res = []
-    for i in items:
-        res.append(i['title'])
-
-    return res
-
-
-
+#
 # namespace = 'slaviktest'
 # chat_id = 1
 #
 # bs1 = getMenuLayout(namespace, chat_id)['buttons']
-#
-#
-# # pprint(bs1)
 # bs2 = getMenuLayout(namespace, chat_id, bs1[1]['callback'])['buttons']
 # bs3 = getMenuLayout(namespace, chat_id, bs2[0]['callback'])['buttons']
-# bs4 = getMenuLayout(namespace, chat_id, bs3[0]['callback'])['buttons']
-# bs5 = getMenuLayout(namespace, chat_id, bs4[0]['callback'])['buttons']
-# pprint(bs5)
+# bs4 = getMenuLayout(namespace, chat_id, bs3[1]['callback'])['buttons']
+# bs5 = getMenuLayout(namespace, chat_id, bs4[1]['callback'])['buttons']
+
+# pprint(bs3[1])
+#
+# pprint(getMenuLayout(namespace, chat_id, bs4[1]['callback']))
 #
 # pprint(getMenuLayout(namespace, chat_id, bs3[0]['callback']))
 #

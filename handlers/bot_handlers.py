@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
 from handlers.message_handler import logger
+
 from API.main import *
 from models.Models import *
-from API.main import *
+
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 from utils.register import authStatus, checkAuth, registerNewUser
 from utils.data import *
