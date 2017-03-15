@@ -80,7 +80,7 @@ def updateOrderStateByChatId(chat_id, new_state):
 # ========= Order Item ==========
 
 class Item:
-    def __init__(self, id=0, name=u"Маффин", count=1, price=120):
+    def __init__(self, id, name, count, price):
         self.id = id
         self.name = name
         self.count = count
@@ -94,4 +94,8 @@ class Item:
 
     @staticmethod
     def from_dict(map):
-        return Item(map)
+        return Item(map['id'],
+                    map['name'],
+                    map['count'],
+                    map['price'])
+
