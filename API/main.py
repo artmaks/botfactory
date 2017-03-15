@@ -1,9 +1,10 @@
 # -*- coding: utf-8 -*-
 import requests
 import json
+from google.appengine.ext import ndb
 from pprint import pprint
 
-def getMenu(namespace):
+def get_menu(namespace):
     url = 'http://%s.1.doubleb-automation-production.appspot.com/api/menu' % (namespace)
     res = requests.get(url)
     if (res.ok):
@@ -13,12 +14,11 @@ def getMenu(namespace):
 
 state = {'steps': []}
 
-def getProductStateByChatId(chat_id):
-    return state
+def getStateByChatId(chat_id):
+    return json.loads(getMenuStateByChatId(chat_id))
 
-def saveProductState(st, chat_id):
-    global state
-    state = st
+def saveState(chat_id, st):
+    updateMenuStateByChatId(chat_id, st)
 
 def make_step_cat(catlist, c_id):
     for entry in catlist:
@@ -232,7 +232,7 @@ def getChoiceIndex(choices, tofind):
             return i
 
 def getMenuLayout(namespace, chat_id, callback=None):
-    menu = getMenu(namespace)['menu']
+    menu = get_menu(namespace)['menu']
     if callback == None:
         callback = {'type': 'category', 'id': None}
 
@@ -283,15 +283,15 @@ def getMenuLayout(namespace, chat_id, callback=None):
 
         layout = getCategoryLayout(menu, state['steps'])
 
+
     elif cb_type == 'add':
         # addToCart(history['item']) # FOR PLATON
         layout = {'text': u'Товар добавлен в корзину!'}
 
-
     saveProductState(state)
+
     # pprint(layout)
     return layoutComplement(layout)
-
 
 
 #
