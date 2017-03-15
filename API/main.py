@@ -155,7 +155,7 @@ def getItemLayout(steps, item):
     cb_minus = {}
     cb_minus['type'] = 'count'
     cb_minus['val'] = -1
-    b_minus = makeButton('+1', cb_minus)
+    b_minus = makeButton('-1', cb_minus)
 
     buttons += [b_plus, b_minus]
 
