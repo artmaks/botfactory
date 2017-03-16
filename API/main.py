@@ -75,11 +75,11 @@ def list_categories(categories, steps):
 
     for cat in categories:
         cb = makeCBWithID('category', cat['info']['category_id'])
-        res += [makeButton(cat['info']['title'], cb, ITEM_CHAT)]
+        res += [makeButton(cat['info']['title'], cb)]
 
     if len(steps) > 0:
         cb = makeEmptyCB('back')
-        res += [makeButton(u'Назад', cb, ITEM_CHAT)]
+        res += [makeButton(u'Назад', cb)]
 
     return {'buttons': res}
 
@@ -198,8 +198,6 @@ def updateChoices(choices, toSelect):
     return choices
 
 
-
-
 def getOptionLayout(item, option_name):
     # pprint(getChoicesJson(item, option_name))
     choices, opt_ind = getChoicesJson(item, option_name)
@@ -223,6 +221,16 @@ def getChoiceIndex(choices, tofind):
         if ch['id'] == tofind:
             return i
 
+
+def getContinueOrderLayout():
+    cb_continue = makeEmptyCB('continue_order')
+    button_continue = {'name': 'Continue order', 'callback': cb_continue}
+    cb_checkout = makeEmptyCB('main')
+    button_checkout = {'name': 'Checkout', 'callback': cb_checkout}
+
+    return {'text': u'Товар добавлен в корзину!', 'buttons': [button_continue, button_checkout]}
+
+
 def getMenuLayout(namespace, chat_id, callback=None):
     menu = get_menu(namespace)['menu']
     if callback == None:
@@ -237,8 +245,7 @@ def getMenuLayout(namespace, chat_id, callback=None):
         if callback['id'] is not None:
             step = {'id': callback['id'], 'type': 'categ'}
             state['steps'].append(step)
-        layout =  getCategoryLayout(menu, steps)
-
+        layout = getCategoryLayout(menu, steps)
 
     elif cb_type == 'item':
         step = {'id': callback['id'], 'type': 'item'}
@@ -276,9 +283,7 @@ def getMenuLayout(namespace, chat_id, callback=None):
 
         layout = getCategoryLayout(menu, state['steps'])
 
-
     elif cb_type == 'add':
-        # addToCart(history['item']) # FOR PLATON
         order = getOrderStateByChatId(chat_id)
         item_dict = state['item']
         item_id = item_dict['id']
@@ -294,8 +299,12 @@ def getMenuLayout(namespace, chat_id, callback=None):
                     item_price)
             order[item_id] = item
 
+        state = {'steps': []}
         updateOrderStateByChatId(chat_id, order)
-        layout = {'text': u'Товар добавлен в корзину!'}
+        layout = getContinueOrderLayout()
+
+    elif cb_type == 'continue_order':
+        layout = getMenuLayout(namespace, chat_id)
 
     saveState(chat_id, state)
 
