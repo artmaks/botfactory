@@ -62,13 +62,8 @@ def orderToOrderDict(order):
     order['items'] = items
     return order
 
-
 def getOrderStateByChatId(chat_id):
     state = [p.to_dict() for p in OrderState.query(OrderState.chat_id == str(chat_id)).fetch()]
-
-    if len(state) == 0:
-        return defaultOrder()
-
     state_items = orderDictToOrder(json.loads(state[0]['state']))
     return state_items
 

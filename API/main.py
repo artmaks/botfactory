@@ -7,6 +7,9 @@ from utils.data import Item
 from API.api_utils import *
 from API.order_menu import makeMainCB
 
+import sys
+reload(sys)
+sys.setdefaultencoding('utf8')
 
 def get_menu(namespace):
     url = 'http://%s.1.doubleb-automation-production.appspot.com/api/menu' % (namespace)
@@ -19,7 +22,31 @@ def get_menu(namespace):
 # state = {'steps': []}
 
 
+def makeItemMenuCB():
+    cb = {}
+    cb['chat'] = ITEM_CHAT
+    return cb
 
+def makeEmptyCB(type):
+    cb = makeItemMenuCB()
+    cb['type'] = type
+    return cb
+
+def makeCBWithID(type, id):
+    cb = makeEmptyCB(type)
+    cb['id'] = id
+    return cb
+
+def makeCountCB(val):
+    cb = makeEmptyCB('count')
+    cb['val'] = val
+    return cb
+
+def getStateByChatId(chat_id):
+    return json.loads(getMenuStateByChatId(chat_id))
+
+def saveState(chat_id, st):
+    updateMenuStateByChatId(chat_id, st)
 
 def make_step_cat(catlist, c_id):
     for entry in catlist:
@@ -140,6 +167,7 @@ def getItemLayout(item):
     b_plus = makeButton('+1', cb_plus)
 
     cb_minus = makeCountItemCB(-1)
+
     b_minus = makeButton('-1', cb_minus)
 
     buttons += [b_plus, b_minus]
@@ -196,6 +224,43 @@ def getChoiceIndex(choices, tofind):
     for i, ch in enumerate(choices):
         if ch['id'] == tofind:
             return i
+          
+def constructItemId(item):
+    id = str(item['id'])
+    opts = item['group_modifiers']
+    for opt in opts:
+        choices = opt['choices']
+        for ch in choices:
+            if ch['default']:
+                id += '#{0}'.format(ch['id'])
+    return id
+
+def constructName(item):
+    name = item['title']
+
+    mods = []
+
+    opts = item['group_modifiers']
+    for opt in opts:
+        choices = opt['choices']
+        for ch in choices:
+            if ch['default']:
+                mods.append(unicode(ch['title']))
+
+    if len(mods) > 0:
+        m_string = ' ({0})'.format(', '.join(mods))
+        name += m_string
+    return name
+
+
+def getContinueOrderLayout():
+    cb_continue = makeEmptyCB('continue_order')
+    button_continue = {'name': 'Continue order', 'callback': cb_continue}
+    cb_checkout = makeMainCB()
+    button_checkout = {'name': 'Checkout', 'callback': cb_checkout}
+
+    return {'text': u'Товар добавлен в корзину!', 'buttons': [button_continue, button_checkout]}
+
 
 def constructItemId(item):
     id = str(item['id'])
@@ -343,4 +408,3 @@ def getMenuLayout(namespace, chat_id, callback=None):
 # pprint(getMenuLayout(namespace, chat_id, bs3[0]['callback']))
 #
 # pprint(state)
-
