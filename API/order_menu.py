@@ -5,21 +5,15 @@ from pprint import pprint
 import sys
 from API.api_utils import *
 
-#
-
 reload(sys)
 sys.setdefaultencoding('utf8')
 # ======================= STUBS FOR LOGIC TESTING ==========================
 
 # Stub class to be replaced by model in Models.p
 
-
-
-
 # ========================= (supposed to be) PRODUCTION CODE ======================
 
 # callback['type'] = 'main' | 'proc'(proceed) | 'clear' | 'edit' | 'item' | 'count' | 'remove'
-
 
 
 def emptyOrderLayout():

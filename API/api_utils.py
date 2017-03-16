@@ -157,6 +157,7 @@ def layoutComplement(layout):
 
     return layout
 
+
 def getOrderCost(order):
     cost = 0
     for id in order:
