@@ -163,7 +163,7 @@ def getOrderCost(order):
         item = order[id]
         cost += item.price * item.count
     return cost
-
+#
 
 def buildItemsString(order):
     lines = []
