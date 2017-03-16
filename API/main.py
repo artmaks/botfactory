@@ -233,7 +233,7 @@ def getContinueOrderLayout():
 
 def getMenuLayout(namespace, chat_id, callback=None):
     menu = get_menu(namespace)['menu']
-    if not callback:
+    if callback == None:
         callback = {'type': 'category', 'id': None}
 
     cb_type = callback['type']
