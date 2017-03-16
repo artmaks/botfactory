@@ -157,6 +157,10 @@ def getFinalLayout(order):
 
     return layout
 
+
+def submitOrder(namespace, chat_id, order):
+    pass
+
 def getCheckoutMenuLayout(namespace, chat_id, callback):
 
     order = loadOrder(chat_id)
@@ -186,3 +190,4 @@ def getCheckoutMenuLayout(namespace, chat_id, callback):
 
     layout = layoutComplement(layout)
     return layout
+
