@@ -94,7 +94,7 @@ def menu_button(bot, update):
 
     reply_markup = InlineKeyboardMarkup(keyboard)
 
-    bot.editMessageText(text="Menu: \n " + (layout['text'] or ''),
+    bot.editMessageText(text=(layout['text'] or ''),
                         chat_id=query.message.chat_id,
                         message_id=query.message.message_id,
                         reply_markup=reply_markup)

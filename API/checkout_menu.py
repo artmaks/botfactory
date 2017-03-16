@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 
 from api_utils import loadOrder, saveOrder, makeMoveCallback, \
-    makeButton, makeMainCB, buildItemsString, layoutComplement
+    makeButton, makeMainCB, buildItemsStringDict, layoutComplement, \
+    TYPE
 
 import sys
 reload(sys)
@@ -120,13 +121,13 @@ def getPayString(pay):
         return u'Оплата картой'
 
 
-def buildOrderString(order):
+def buildOrderString(order, namespace):
     lines = []
 
-    itemsString = buildItemsString(order['items'])
+    itemsString = buildItemsStringDict(order['items'])
     lines.append(itemsString)
 
-    addrString = u'Адрес: {0}'.format(getAddressById(order['address']))
+    addrString = u'Адрес: {0}'.format(getAddressById(namespace, order['address']))
     lines.append(addrString)
 
     placeString = getPlaceString(order['place'])
@@ -140,9 +141,9 @@ def buildOrderString(order):
 
     return '\n'.join(lines)
 
-def getFinalLayout(order):
+def getFinalLayout(order, namespace):
     layout = {}
-    layout['text'] = buildOrderString(order)
+    layout['text'] = buildOrderString(order, namespace)
     buttons = []
 
     cb_submit = makeMoveCallback('submit')
@@ -165,26 +166,27 @@ def getCheckoutMenuLayout(namespace, chat_id, callback):
 
     order = loadOrder(chat_id)
 
+
     if 'update' in callback and callback['update'] is not None:
         order[callback['update']] = callback['val']
         saveOrder(chat_id, order)
 
-    if callback['type'] == 'address':
+    if callback[TYPE] == 'address':
         layout = getAddressLayout(namespace)
 
-    elif callback['type'] == 'place':
+    elif callback[TYPE] == 'place':
         layout = getPlaceLayout()
 
-    elif callback['type'] == 'time':
-       layout = getTimeLayout()
+    elif callback[TYPE] == 'time':
+        layout = getTimeLayout()
 
-    elif callback['type'] == 'pay':
+    elif callback[TYPE] == 'pay':
         layout = getPayLayout()
 
-    elif callback['type'] == 'final':
-        layout = getFinalLayout(order)
+    elif callback[TYPE] == 'final':
+        layout = getFinalLayout(order, namespace)
 
-    elif callback['type'] == 'submit':
+    elif callback[TYPE] == 'submit':
         submitOrder(namespace, chat_id, order)
         layout = {'text': u'Заказ успешно добавлен!'}
 
