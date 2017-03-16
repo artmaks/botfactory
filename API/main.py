@@ -259,9 +259,9 @@ def constructName(item):
 
 def getContinueOrderLayout():
     cb_continue = makeEmptyCB('continue_order')
-    button_continue = {'name': 'Continue order', 'callback': cb_continue}
+    button_continue = {'name': 'К меню', 'callback': cb_continue}
     cb_checkout = makeMainCB()
-    button_checkout = {'name': 'Checkout', 'callback': cb_checkout}
+    button_checkout = {'name': 'Оформить заказ', 'callback': cb_checkout}
 
     return {'text': u'Товар добавлен в корзину!', 'buttons': [button_continue, button_checkout]}
 
