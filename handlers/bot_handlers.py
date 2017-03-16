@@ -77,7 +77,11 @@ def menu_button(bot, update):
         return
 
     # items = getItems(data['api_namespace'], query.data)
-    layout = getMenuLayout(data['api_namespace'], query.message.chat_id, json.loads(query.data))
+    callback = json.loads(query.data)
+    if callback['chat'] == ITEM_CHAT:
+        layout = getMenuLayout(data['api_namespace'], query.message.chat_id, json.loads(query.data))
+    elif callback['chat'] == ORDER_CHAT:
+        layout = getOrderMenuLayout(query.message.chat_id, json.loads(query.data))
 
     keyboard = []
     for i in layout['buttons']:
