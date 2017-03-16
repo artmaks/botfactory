@@ -114,7 +114,11 @@ def getItemsBySteps(menu, steps):
 def getCategoryLayout(menu, steps):
 
     if len(steps) == 0:
-        return list_categories(menu, steps)
+        layout = list_categories(menu, steps)
+        cb_order = makeMainCB()
+        b = makeButton(u'Перейти к заказу')
+        layout['buttons'].append(b)
+        return layout
 
     first = True
     for step in steps:

@@ -12,11 +12,6 @@ class Users(ndb.Model):
     chat_id = ndb.StringProperty(default='')
     api_user_id = ndb.StringProperty(default='')
 
-class Order(ndb.Model):
-    name = ndb.StringProperty(default='')
-    chat_id = ndb.StringProperty(default='')
-    active = ndb.BooleanProperty(default=True)
-
 class OrderState(ndb.Model):
     chat_id = ndb.StringProperty(default='')
     state = ndb.TextProperty(default='')
