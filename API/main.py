@@ -6,6 +6,7 @@ from pprint import pprint
 from utils.data import Item, getMenuStateByChatId, updateMenuStateByChatId
 from utils.data import getOrderStateByChatId, updateOrderStateByChatId
 from API.api_utils import *
+from API.order_menu import makeMainCB
 
 import sys
 reload(sys)
@@ -251,10 +252,12 @@ def constructName(item):
         m_string = ' ({0})'.format(', '.join(mods))
         name += m_string
     return name
+
+
 def getContinueOrderLayout():
     cb_continue = makeEmptyCB('continue_order')
     button_continue = {'name': 'Continue order', 'callback': cb_continue}
-    cb_checkout = makeEmptyCB('main')
+    cb_checkout = makeMainCB()
     button_checkout = {'name': 'Checkout', 'callback': cb_checkout}
 
     return {'text': u'Товар добавлен в корзину!', 'buttons': [button_continue, button_checkout]}
