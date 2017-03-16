@@ -1,12 +1,18 @@
 # -*- coding: utf-8 -*-
 from handlers.message_handler import logger
-from API.main import getMenu, getCategories, getItems
+
+from API.main import *
+from API.order_menu import *
+from API.checkout_menu import getCheckoutMenuLayout
+from models.Models import *
+
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 from utils.register import authStatus, checkAuth, registerNewUser
-from utils.data import getBotDataByName
+from utils.data import *
+import json
+from google.appengine.ext import ndb
 
 orders = {}
-
 
 def text_handler(bot, update):
     bot_name = bot.name.replace('@', '')
@@ -41,11 +47,16 @@ def namespace(bot, update):
 def menu(bot, update):
     bot_name = bot.name.replace('@', '')
     data = getBotDataByName(bot_name)
-    categories = getCategories(data['api_namespace'])
+
+    resetMenuState(update.message.chat_id, update.message.message_id)
+
+    layout = getMenuLayout(data['api_namespace'], update.message.chat_id)
 
     keyboard = []
-    for i in categories:
-        keyboard.append([InlineKeyboardButton(i, callback_data=i)])
+    for i in layout['buttons']:
+        name = i['name']
+        callback = json.dumps(i['callback'])
+        keyboard.append([InlineKeyboardButton(name, callback_data=callback)])
 
     reply_markup = InlineKeyboardMarkup(keyboard)
 
@@ -58,15 +69,32 @@ def menu_button(bot, update):
 
     bot_name = bot.name.replace('@', '')
     data = getBotDataByName(bot_name)
-    items = getItems(data['api_namespace'], query.data)
+
+    # Если id сообщения отличается не больше чем на 1, так как в телеграме сообщения дублируются
+    if(query.message.message_id - 1 != getCurrentMenuMessage(query.message.chat_id)):
+        bot.editMessageText(text="Воспользуйтесь последним открытым меню",
+            chat_id=query.message.chat_id,
+            message_id=query.message.message_id)
+        return
+
+    # items = getItems(data['api_namespace'], query.data)
+    callback = json.loads(query.data)
+    if callback['chat'] == ITEM_CHAT:
+        layout = getMenuLayout(data['api_namespace'], query.message.chat_id, json.loads(query.data))
+    elif callback['chat'] == ORDER_CHAT:
+        layout = getOrderMenuLayout(query.message.chat_id, json.loads(query.data))
+    elif callback['chat'] == CHECKOUT_CHAT:
+        layout = getCheckoutMenuLayout(data['api_namespace'], query.message.chat_id, json.loads(query.data))
 
     keyboard = []
-    for i in items:
-        keyboard.append([InlineKeyboardButton(i, callback_data=i)])
+    for i in layout['buttons']:
+        name = i['name']
+        callback = json.dumps(i['callback'])
+        keyboard.append([InlineKeyboardButton(name, callback_data=callback)])
 
     reply_markup = InlineKeyboardMarkup(keyboard)
 
-    bot.editMessageText(text="Menu:",
+    bot.editMessageText(text="Menu: \n " + (layout['text'] or ''),
                         chat_id=query.message.chat_id,
                         message_id=query.message.message_id,
                         reply_markup=reply_markup)
@@ -80,21 +108,22 @@ def help(bot, update):
 @checkAuth
 def order(bot, update):
     chat_id = update.message.chat_id
-    if chat_id in orders:
-        bot.sendMessage(chat_id, text='You are already ordering!')
-    else:
-        orders[chat_id] = "order"
-        bot.sendMessage(chat_id, text='New order started!')
 
+    bot_name = bot.name.replace('@', '')
+    data = getBotDataByName(bot_name)
 
-@checkAuth
-def checkout(bot, update):
-    chat_id = update.message.chat_id
-    if chat_id in orders:
-        del orders[chat_id]
-        bot.sendMessage(chat_id, text='Proceeding to checkout!')
-    else:
-        bot.sendMessage(chat_id, text='No active order!')
+    layout = getOrderMenuLayout(chat_id)
+
+    keyboard = []
+    for i in layout['buttons']:
+        name = i['name']
+        callback = json.dumps(i['callback'])
+        keyboard.append([InlineKeyboardButton(name, callback_data=callback)])
+
+    reply_markup = InlineKeyboardMarkup(keyboard)
+
+    update.message.reply_text(layout['text'] or '', reply_markup=reply_markup)
+
 
 
 def error(bot, update, error):
