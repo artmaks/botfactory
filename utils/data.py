@@ -52,19 +52,27 @@ def defaultOrder():
             'pay': None}
 
 def orderDictToOrder(order_dict):
-    items = {i: Item.from_dict(order_dict[i]) for i in order_dict['items']}
+    items = {i: Item.from_dict(order_dict['items'][i]) for i in order_dict['items']}
     order_dict['items'] = items
+    # i = order_dict['items']['5710239819104256']
     return order_dict
 
 
 def orderToOrderDict(order):
-    items  = {i: order[i].to_dict() for i in order['items']}
+    items  = {i: order['items'][i].to_dict() for i in order['items']}
     order['items'] = items
     return order
 
 def getOrderStateByChatId(chat_id):
     state = [p.to_dict() for p in OrderState.query(OrderState.chat_id == str(chat_id)).fetch()]
+
+    if len(state) == 0:
+        return defaultOrder()
+
     state_items = orderDictToOrder(json.loads(state[0]['state']))
+
+    # i = state_items['items']['5710239819104256']
+
     return state_items
 
 
@@ -95,14 +103,34 @@ class Item:
 
     def __str__(self):
         return unicode(u"{0} (x{1}) - {2}руб.".format(self.name, self.count, self.count * self.price))
+    def getId(self):
+        return self.id
+
+    def getName(self):
+        return self.name
+
+    def getCount(self):
+        return self.count
+
+    def getPrice(self):
+        return self.price
 
     def to_dict(self):
         return self.__dict__
 
     @staticmethod
     def from_dict(map):
-        return Item(map['id'],
+        item = Item(map['id'],
                     map['name'],
                     map['count'],
                     map['price'])
 
+        return item
+
+
+i = {'id': 1, 'name': 'safa', 'count': 1, 'price': 100}
+
+
+print(type(i))
+
+print(type(Item.from_dict(i)))
