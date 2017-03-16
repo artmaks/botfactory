@@ -19,14 +19,15 @@ def get_menu(namespace):
     else:
         return 'Error'
 
-# state = {'steps': []}
+state = {'steps': []}
 
 
 def getStateByChatId(chat_id):
-    return json.loads(getMenuStateByChatId(chat_id))
+    return state
 
 def saveState(chat_id, st):
-    updateMenuStateByChatId(chat_id, st)
+    global state
+    state = st
 
 def make_step_cat(catlist, c_id):
     for entry in catlist:
@@ -64,7 +65,7 @@ def list_categories(categories, steps):
 
     if len(steps) > 0:
         cb = makeEmptyCB('back')
-        res += [makeButton(u'Назад', cb)]
+        res += [makeButton(u'<- Назад', cb)]
 
     return {'buttons': res}
 
@@ -78,7 +79,7 @@ def list_items(items, steps):
 
     if len(steps) > 0:
         cb = makeEmptyCB('back')
-        res += [makeButton(u'Назад', cb)]
+        res += [makeButton(u'<- Назад', cb)]
 
     return {'buttons': res}
 
@@ -161,7 +162,7 @@ def getItemLayout(item):
     buttons += [b_add]
 
     cb_back = makeEmptyCB('back')
-    b_back = makeButton(u'Назад', cb_back)
+    b_back = makeButton(u'<- Назад', cb_back)
     buttons += [b_back]
 
     layout['buttons'] = buttons
@@ -242,42 +243,6 @@ def getContinueOrderLayout():
     button_continue = {'name': 'К меню', 'callback': cb_continue}
     cb_checkout = makeMainCB()
     button_checkout = {'name': 'Оформить заказ', 'callback': cb_checkout}
-
-    return {'text': u'Товар добавлен в корзину!', 'buttons': [button_continue, button_checkout]}
-
-def constructItemId(item):
-    id = str(item['id'])
-    opts = item['group_modifiers']
-    for opt in opts:
-        choices = opt['choices']
-        for ch in choices:
-            if ch['default']:
-                id += '#{0}'.format(ch['id'])
-    return id
-
-def constructName(item):
-    name = item['title']
-
-    mods = []
-
-    opts = item['group_modifiers']
-    for opt in opts:
-        choices = opt['choices']
-        for ch in choices:
-            if ch['default']:
-                mods.append(unicode(ch['title']))
-
-    if len(mods) > 0:
-        m_string = ' ({0})'.format(', '.join(mods))
-        name += m_string
-    return name
-
-
-def getContinueOrderLayout():
-    cb_continue = makeCBWithID('category', None)
-    button_continue = {'name': 'Continue order', 'callback': cb_continue}
-    cb_checkout = makeMainCB()
-    button_checkout = {'name': 'Checkout', 'callback': cb_checkout}
 
     return {'text': u'Товар добавлен в корзину!', 'buttons': [button_continue, button_checkout]}
 
@@ -391,3 +356,5 @@ def getMenuLayout(namespace, chat_id, callback=None):
 # pprint(getMenuLayout(namespace, chat_id, bs3[0]['callback']))
 #
 # pprint(state)
+
+
