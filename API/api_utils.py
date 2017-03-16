@@ -11,6 +11,8 @@ ITEM_CHAT = 'i'
 ORDER_CHAT = 'o'
 CHECKOUT_CHAT = 'c'
 
+TYPE = 't'
+
 # ============ Item callbacks ===============
 
 def makeItemMenuCB():
@@ -20,7 +22,7 @@ def makeItemMenuCB():
 
 def makeEmptyCB(type):
     cb = makeItemMenuCB()
-    cb['type'] = type
+    cb[TYPE] = type
     return cb
 
 def makeCBWithID(type, id):
@@ -43,44 +45,44 @@ def makeOrderCB():
 
 def makeMainCB():
     cb = makeOrderCB()
-    cb['type'] = 'main'
+    cb[TYPE] = 'main'
     return cb
 
 def makeProcCB():
     cb = makeOrderCB()
-    cb['type'] = 'proc'
+    cb[TYPE] = 'proc'
     return cb
 
 def makeClearCB():
     cb = makeOrderCB()
-    cb['type'] = 'clear'
+    cb[TYPE] = 'clear'
     return cb
 
 
 def makeEditCB():
     cb = makeOrderCB()
-    cb['type'] = 'edit'
+    cb[TYPE] = 'edit'
     return cb
 
 
 def makeItemCB(item_id):
     cb = makeOrderCB()
-    cb['type'] = 'item'
+    cb[TYPE] = 'item'
     cb['id'] = item_id
     return cb
 
 
 def makeCountOrderCB(val, item_id):
     cb = makeOrderCB()
-    cb['type'] = 'count'
-    cb['val'] = val
-    cb['item_id'] = item_id
+    cb[TYPE] = 'c'
+    cb['v'] = val
+    cb['id'] = item_id
     return cb
 
 
 def makeRemoveCB(item_id):
     cb = makeOrderCB()
-    cb['type'] = 'remove'
+    cb[TYPE] = 'remove'
     cb['item_id'] = item_id
     return cb
 
@@ -94,7 +96,7 @@ def makeCheckoutCB():
 
 def makeMoveCallback(to, update=None, upd_val=None):
     cb = makeCheckoutCB()
-    cb['type'] = to
+    cb[TYPE] = to
     cb['update'] = update
     cb['val'] = upd_val
     return cb
@@ -162,9 +164,11 @@ def getOrderCost(order):
     cost = 0
     for id in order:
         item = order[id]
-        cost += item.price * item.count
+        cost += item.getPrice() * item.getCount()
     return cost
 #
+
+
 
 def buildItemsString(order):
     lines = []
@@ -175,5 +179,28 @@ def buildItemsString(order):
         lines.append(str(order[id]))
 
     lines.append(u"\tВсего: {0}руб.".format(getOrderCost(order)))
+
+    return '\n'.join(lines)
+
+def getOrderCostDict(order):
+    cost = 0
+    for id in order:
+        item = order[id]
+        cost += item['price'] * item['count']
+    return cost
+
+def itemDictToStr(item):
+    return unicode(u"{0} (x{1}) - {2}руб.".format(item['name'], item['count'], item['count'] * item['price']))
+
+
+def buildItemsStringDict(order):
+    lines = []
+
+    lines.append(u'Ваш заказ:')
+
+    for id in order:
+        lines.append(itemDictToStr(order[id]))
+
+    lines.append(u"\tВсего: {0}руб.".format(getOrderCostDict(order)))
 
     return '\n'.join(lines)
