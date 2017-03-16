@@ -44,21 +44,26 @@ def updateMenuStateByChatId(chat_id, new_state):
         state_entity.put()
 
 #======= Orders state ======
+def defaultOrder():
+    return {'items': {},
+            'address': None,
+            'place': None,
+            'time': None,
+            'pay': None}
+
 def orderDictToOrder(order_dict):
-    order = {i: Item.from_dict(order_dict[i]) for i in order_dict}
-    return order
-
-
-def orderToOrderDict(order):
-    order_dict = {i: order[i].to_dict() for i in order}
+    items = {i: Item.from_dict(order_dict[i]) for i in order_dict['items']}
+    order_dict['items'] = items
     return order_dict
 
 
+def orderToOrderDict(order):
+    items  = {i: order[i].to_dict() for i in order['items']}
+    order['items'] = items
+    return order
+
 def getOrderStateByChatId(chat_id):
     state = [p.to_dict() for p in OrderState.query(OrderState.chat_id == str(chat_id)).fetch()]
-    if len(state) == 0:
-        return {}
-
     state_items = orderDictToOrder(json.loads(state[0]['state']))
     return state_items
 

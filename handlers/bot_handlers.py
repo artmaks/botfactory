@@ -3,6 +3,7 @@ from handlers.message_handler import logger
 
 from API.main import *
 from API.order_menu import *
+from API.checkout_menu import getCheckoutMenuLayout
 from models.Models import *
 
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup
@@ -82,6 +83,8 @@ def menu_button(bot, update):
         layout = getMenuLayout(data['api_namespace'], query.message.chat_id, json.loads(query.data))
     elif callback['chat'] == ORDER_CHAT:
         layout = getOrderMenuLayout(query.message.chat_id, json.loads(query.data))
+    elif callback['chat'] == CHECKOUT_CHAT:
+        layout = getCheckoutMenuLayout(data['api_namespace'], query.message.chat_id, json.loads(query.data))
 
     keyboard = []
     for i in layout['buttons']:

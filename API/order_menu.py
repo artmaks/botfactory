@@ -1,11 +1,9 @@
 # -*- coding: utf-8 -*-
 from pprint import pprint
-from API.main import makeButton, layoutComplement
+# from API.main import makeButton, layoutComplement
 # encoding=utf8
 import sys
 from API.api_utils import *
-from utils.data import Item, getOrderStateByChatId, updateOrderStateByChatId
-
 
 reload(sys)
 sys.setdefaultencoding('utf8')
@@ -13,113 +11,34 @@ sys.setdefaultencoding('utf8')
 
 # Stub class to be replaced by model in Models.p
 
-def loadOrder(chat_id):
-    return getOrderStateByChatId(chat_id)
-
-def saveOrder(chat_id, order_state):
-    updateOrderStateByChatId(chat_id, order_state)
-
-def clearOrder(chat_id):
-    order = {}
-    saveOrder(chat_id, order)
-
-def updateItem(item, chat_id):
-    order = loadOrder(chat_id)
-    order[item.id] = item
-    saveOrder(chat_id, order)
-
-def removeItem(item, chat_id):
-    order = loadOrder(chat_id)
-    order.pop(item.id)
-    saveOrder(chat_id, order)
-
-
 # ========================= (supposed to be) PRODUCTION CODE ======================
 
 # callback['type'] = 'main' | 'proc'(proceed) | 'clear' | 'edit' | 'item' | 'count' | 'remove'
 
-def makeOrderCB():
-    cb = {}
-    cb['chat'] = ORDER_CHAT
-    return cb
-
-def makeMainCB():
-    cb = makeOrderCB()
-    cb['type'] = 'main'
-    return cb
-
-def makeProcCB():
-    cb = makeOrderCB()
-    cb['type'] = 'proc'
-    return cb
-
-def makeClearCB():
-    cb = makeOrderCB()
-    cb['type'] = 'clear'
-    return cb
-
-
-def makeEditCB():
-    cb = makeOrderCB()
-    cb['type'] = 'edit'
-    return cb
-
-
-def makeItemCB(item_id):
-    cb = makeOrderCB()
-    cb['type'] = 'item'
-    cb['id'] = item_id
-    return cb
-
-
-def makeCountCB(val, item_id):
-    cb = makeOrderCB()
-    cb['type'] = 'count'
-    cb['val'] = val
-    cb['item_id'] = item_id
-    return cb
-
-
-def makeRemoveCB(item_id):
-    cb = makeOrderCB()
-    cb['type'] = 'remove'
-    cb['item_id'] = item_id
-    return cb
 
 def emptyOrderLayout():
     layout = {}
     layout['buttons'] = []
-    layout['text'] = u"Ваш заказ пуст. Добавьте в него что-нибудь с помощью команды /menu! :)"
+    layout['text'] = u"Ваш заказ пуст."
 
     return layout
 
-def buildOrderString(order):
-    lines = []
-
-    lines.append(u'Ваш заказ:')
-
-    for id in order:
-        lines.append(str(order[id]))
-
-    lines.append(u"\tВсего: {0}руб.".format(getOrderCost(order)))
-
-    return '\n'.join(lines)
 
 def orderLayout(order):
     layout = {}
-    layout['text'] = buildOrderString(order)
+    layout['text'] = buildItemsString(order)
 
     buttons = []
 
-    proceed_cb = {'type': 'proc'}
+    proceed_cb = makeMoveCallback('addr')
     proceed_button = makeButton(u"Подтвердить", proceed_cb)
     buttons.append(proceed_button)
 
-    edit_cb = {'type': 'edit'}
+    edit_cb = makeEditCB()
     edit_button = makeButton(u"Изменить заказ", edit_cb)
     buttons.append(edit_button)
 
-    clear_cb = {'type': 'clear'}
+    clear_cb = makeClearCB()
     clear_button = makeButton(u"Очистить заказ", clear_cb)
     buttons.append(clear_button)
 
@@ -127,29 +46,32 @@ def orderLayout(order):
 
     return layout
 
-def getOrderCost(order):
-    cost = 0
-    for id in order:
-        item = order[id]
-        cost += item.price * item.count
-    return cost
 
 def getMainOrderLayout(chat_id):
-    order = loadOrder(chat_id)
-
+    order = loadOrder(chat_id)['items']
+    l = {}
     if (len(order) == 0) :
-        return emptyOrderLayout()
+        l = emptyOrderLayout()
     else:
-        return orderLayout(order)
+        l = orderLayout(order)
+
+    cb = makeCBWithID('category', None)
+    b_back = makeButton(u"Добавить товар", cb)
+
+    l['buttons'].append(b_back)
+
+    return l
+
+
 
 def getEditLayout(chat_id):
-    order = loadOrder(chat_id)
+    order = loadOrder(chat_id)['items']
 
     for id in order.keys():
         if order[id].count == 0:
             order.pop(id)
 
-    saveOrder(chat_id, order)
+    updateOrderItems(chat_id, order)
 
     layout = {}
     buttons = []
@@ -165,18 +87,18 @@ def getEditLayout(chat_id):
     return layout
 
 def getItemLayout(chat_id, item_id):
-    order = loadOrder(chat_id)
+    order = loadOrder(chat_id)['items']
 
     item = order[item_id]
 
     layout = {}
     buttons = []
 
-    cb_plus = makeCountCB(1, item_id)
+    cb_plus = makeCountOrderCB(1, item_id)
     b_plus = makeButton('+1', cb_plus)
     buttons.append(b_plus)
 
-    cb_minus = makeCountCB(-1, item_id)
+    cb_minus = makeCountOrderCB(-1, item_id)
     b_minus = makeButton('-1', cb_minus)
     buttons.append(b_minus)
 
@@ -194,7 +116,7 @@ def getItemLayout(chat_id, item_id):
     return layout
 
 def changeItemCount(chat_id, callback):
-    order = loadOrder(chat_id)
+    order = loadOrder(chat_id)['items']
     item = order[callback['item_id']]
 
     newc = max(item.count + callback['val'], 0)
@@ -203,7 +125,7 @@ def changeItemCount(chat_id, callback):
     updateItem(item, chat_id)
 
 def removeItemById(chat_id, item_id):
-    order = loadOrder(chat_id)
+    order = loadOrder(chat_id)['items']
     item = order[item_id]
 
     removeItem(item, chat_id)
@@ -223,9 +145,6 @@ def getOrderMenuLayout(chat_id, callback=None):
 
     elif callback['type'] == 'edit':
         layout = getEditLayout(chat_id)
-
-    elif callback['type'] == 'proc':
-        pass # TODO
 
     elif callback['type'] == 'item':
         layout = getItemLayout(chat_id, callback['id'])

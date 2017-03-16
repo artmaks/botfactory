@@ -3,8 +3,7 @@ import requests
 import json
 # from google.appengine.ext import ndb
 from pprint import pprint
-from utils.data import Item, getMenuStateByChatId, updateMenuStateByChatId
-from utils.data import getOrderStateByChatId, updateOrderStateByChatId
+from utils.data import Item
 from API.api_utils import *
 from API.order_menu import makeMainCB
 
@@ -21,6 +20,7 @@ def get_menu(namespace):
         return 'Error'
 
 # state = {'steps': []}
+
 
 def makeItemMenuCB():
     cb = {}
@@ -144,9 +144,7 @@ def getCost(item):
     price = getPrice(item)
     return price * item[u'count']
 
-
-
-def getItemLayout(steps, item):
+def getItemLayout(item):
     layout = {}
     layout['img'] = item['pic']
 
@@ -165,10 +163,11 @@ def getItemLayout(steps, item):
 
             buttons += [b]
 
-    cb_plus = makeCountCB(1)
+    cb_plus = makeCountItemCB(1)
     b_plus = makeButton('+1', cb_plus)
 
-    cb_minus = makeCountCB(-1)
+    cb_minus = makeCountItemCB(-1)
+
     b_minus = makeButton('-1', cb_minus)
 
     buttons += [b_plus, b_minus]
@@ -263,6 +262,54 @@ def getContinueOrderLayout():
     return {'text': u'Товар добавлен в корзину!', 'buttons': [button_continue, button_checkout]}
 
 
+def constructItemId(item):
+    id = str(item['id'])
+    opts = item['group_modifiers']
+    for opt in opts:
+        choices = opt['choices']
+        for ch in choices:
+            if ch['default']:
+                id += '#{0}'.format(ch['id'])
+    return id
+
+def constructName(item):
+    name = item['title']
+
+    mods = []
+
+    opts = item['group_modifiers']
+    for opt in opts:
+        choices = opt['choices']
+        for ch in choices:
+            if ch['default']:
+                mods.append(unicode(ch['title']))
+
+    if len(mods) > 0:
+        m_string = ' ({0})'.format(', '.join(mods))
+        name += m_string
+    return name
+
+
+def getContinueOrderLayout():
+    cb_continue = makeCBWithID('category', None)
+    button_continue = {'name': 'Continue order', 'callback': cb_continue}
+    cb_checkout = makeMainCB()
+    button_checkout = {'name': 'Checkout', 'callback': cb_checkout}
+
+    return {'text': u'Товар добавлен в корзину!', 'buttons': [button_continue, button_checkout]}
+
+
+def constructItem(item_dict):
+    item_id = constructItemId(item_dict)
+    item_name = constructName(item_dict)
+    item_count = item_dict['count']
+    item_price = getPrice(item_dict)
+    item = Item(item_id,
+                item_name,
+                item_count,
+                item_price)
+    return item
+
 def getMenuLayout(namespace, chat_id, callback=None):
     menu = get_menu(namespace)['menu']
     if callback == None:
@@ -284,7 +331,7 @@ def getMenuLayout(namespace, chat_id, callback=None):
         state['steps'].append(step)
         item = getItemsBySteps(menu, state['steps'])
         item[u'count'] = 1
-        layout = getItemLayout(state['steps'], item)
+        layout = getItemLayout(item)
 
         state['item'] = item
 
@@ -301,13 +348,13 @@ def getMenuLayout(namespace, chat_id, callback=None):
 
         state['item'] = item
         state['choice'] = None
-        layout = getItemLayout(state['steps'], item)
+        layout = getItemLayout(item)
 
     elif cb_type == 'count':
         item = state['item']
         newcount = max(1, item['count'] + callback['val'])
         item['count'] = newcount
-        layout = getItemLayout(state['steps'], item)
+        layout = getItemLayout(item)
 
     elif cb_type == 'back':
         state['steps'] = state['steps'][:-1]
@@ -316,27 +363,21 @@ def getMenuLayout(namespace, chat_id, callback=None):
         layout = getCategoryLayout(menu, state['steps'])
 
     elif cb_type == 'add':
-        order = getOrderStateByChatId(chat_id)
+        order = loadOrder(chat_id)
         item_dict = state['item']
-        item_id = constructItemId(item_dict)
-        item_name = constructName(item_dict)
-        item_count = item_dict['count']
-        item_price = getPrice(item_dict)
-        if item_id in order:
-            order[item_id].count += item_count
-        else:
-            item = Item(item_id,
-                    item_name,
-                    item_count,
-                    item_price)
-            order[item_id] = item
+        item = constructItem(item_dict)
+
+        if item.id in order:
+            item.id += order[item.id]
+
+        updateItem(item, chat_id)
 
         state = {'steps': []}
         updateOrderStateByChatId(chat_id, order)
         layout = getContinueOrderLayout()
 
-    elif cb_type == 'continue_order':
-        layout = getMenuLayout(namespace, chat_id)
+    # elif cb_type == 'continue_order':
+    #     layout = getMenuLayout(namespace, chat_id)
 
     saveState(chat_id, state)
 
