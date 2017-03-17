@@ -30,7 +30,7 @@ def orderLayout(order):
 
     buttons = []
 
-    proceed_cb = makeMoveCallback('addr')
+    proceed_cb = makeMoveCallback('address')
     proceed_button = makeButton(u"Подтвердить", proceed_cb)
     buttons.append(proceed_button)
 
@@ -82,7 +82,15 @@ def getEditLayout(chat_id):
         b = makeButton(unicode(str(item)), cb)
         buttons.append(b)
 
+    cb_back = makeMainCB()
+    b_back = makeButton(u'<- Назад', cb_back)
+    buttons.append(b_back)
+
     layout['buttons'] = buttons
+
+    s = str(layout['buttons'][0])
+
+    s1 = str(layout['buttons'][1])
 
     return layout
 
@@ -117,9 +125,9 @@ def getItemLayout(chat_id, item_id):
 
 def changeItemCount(chat_id, callback):
     order = loadOrder(chat_id)['items']
-    item = order[callback['item_id']]
+    item = order[callback['id']]
 
-    newc = max(item.count + callback['val'], 0)
+    newc = max(item.count + callback['v'], 0)
     item.count = newc
 
     updateItem(item, chat_id)
@@ -132,28 +140,28 @@ def removeItemById(chat_id, item_id):
 
 def getOrderMenuLayout(chat_id, callback=None):
     if callback is None:
-        callback = {'type': 'main'}
+        callback = {TYPE: 'main'}
 
     layout = {}
 
-    if callback['type'] == 'main':
+    if callback[TYPE] == 'main':
         layout = getMainOrderLayout(chat_id)
 
-    elif callback['type'] == 'clear':
+    elif callback[TYPE] == 'clear':
         clearOrder(chat_id)
         layout = getMainOrderLayout(chat_id)
 
-    elif callback['type'] == 'edit':
+    elif callback[TYPE] == 'edit':
         layout = getEditLayout(chat_id)
 
-    elif callback['type'] == 'item':
+    elif callback[TYPE] == 'item':
         layout = getItemLayout(chat_id, callback['id'])
 
-    elif callback['type'] == 'count':
+    elif callback[TYPE] == 'c':
         changeItemCount(chat_id, callback)
-        layout = getItemLayout(chat_id, callback['item_id'])
+        layout = getItemLayout(chat_id, callback['id'])
 
-    elif callback['type'] == 'remove':
+    elif callback[TYPE] == 'remove':
         removeItemById(chat_id, callback['item_id'])
         layout = getEditLayout(chat_id)
 
