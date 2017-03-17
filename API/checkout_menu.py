@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 
 from api_utils import loadOrder, saveOrder, makeMoveCallback, \
-    makeButton, makeMainCB, buildItemsString, layoutComplement
+    makeButton, makeMainCB, buildItemsStringDict, layoutComplement, \
+    TYPE
 
 import sys
 reload(sys)
@@ -31,7 +32,7 @@ def getAddressLayout(namespace):
         buttons.append(button)
 
     cb_back = makeMainCB()
-    b_back = makeButton(u'Назад', cb_back)
+    b_back = makeButton(u'<- Назад', cb_back)
     buttons.append(b_back)
 
     layout['buttons'] = buttons
@@ -51,7 +52,7 @@ def getPlaceLayout():
     b_out = makeButton(u'С собой', cb_out)
 
     cb_back = makeMoveCallback('address')
-    b_back = makeButton(u'Назад', cb_back)
+    b_back = makeButton(u'<- Назад', cb_back)
 
     buttons = [b_stay, b_out, b_back]
 
@@ -79,7 +80,7 @@ def getTimeLayout():
         buttons.append(b)
 
     cb_back = makeMoveCallback('place')
-    b_back = makeButton(u'Назад', cb_back)
+    b_back = makeButton(u'<- Назад', cb_back)
     buttons.append(b_back)
 
     layout['buttons'] = buttons
@@ -99,7 +100,7 @@ def getPayLayout():
     b_card = makeButton(u'Картой', cb_card)
 
     cb_back = makeMoveCallback('time')
-    b_back = makeButton(u'Назад', cb_back)
+    b_back = makeButton(u'<- Назад', cb_back)
 
     buttons = [b_cash, b_card, b_back]
 
@@ -120,13 +121,13 @@ def getPayString(pay):
         return u'Оплата картой'
 
 
-def buildOrderString(order):
+def buildOrderString(order, namespace):
     lines = []
 
-    itemsString = buildItemsString(order['items'])
+    itemsString = buildItemsStringDict(order['items'])
     lines.append(itemsString)
 
-    addrString = u'Адрес: {0}'.format(getAddressById(order['address']))
+    addrString = u'Адрес: {0}'.format(getAddressById(namespace, order['address']))
     lines.append(addrString)
 
     placeString = getPlaceString(order['place'])
@@ -140,9 +141,9 @@ def buildOrderString(order):
 
     return '\n'.join(lines)
 
-def getFinalLayout(order):
+def getFinalLayout(order, namespace):
     layout = {}
-    layout['text'] = buildOrderString(order)
+    layout['text'] = buildOrderString(order, namespace)
     buttons = []
 
     cb_submit = makeMoveCallback('submit')
@@ -150,7 +151,7 @@ def getFinalLayout(order):
     buttons.append(b_submit)
 
     cb_back = makeMoveCallback('pay')
-    b_back = makeButton(u'Назад', cb_back)
+    b_back = makeButton(u'<- Назад', cb_back)
     buttons.append(b_back)
 
     layout['buttons'] = buttons
@@ -165,26 +166,27 @@ def getCheckoutMenuLayout(namespace, chat_id, callback):
 
     order = loadOrder(chat_id)
 
+
     if 'update' in callback and callback['update'] is not None:
         order[callback['update']] = callback['val']
         saveOrder(chat_id, order)
 
-    if callback['type'] == 'address':
+    if callback[TYPE] == 'address':
         layout = getAddressLayout(namespace)
 
-    elif callback['type'] == 'place':
+    elif callback[TYPE] == 'place':
         layout = getPlaceLayout()
 
-    elif callback['type'] == 'time':
-       layout = getTimeLayout()
+    elif callback[TYPE] == 'time':
+        layout = getTimeLayout()
 
-    elif callback['type'] == 'pay':
+    elif callback[TYPE] == 'pay':
         layout = getPayLayout()
 
-    elif callback['type'] == 'final':
-        layout = getFinalLayout(order)
+    elif callback[TYPE] == 'final':
+        layout = getFinalLayout(order, namespace)
 
-    elif callback['type'] == 'submit':
+    elif callback[TYPE] == 'submit':
         submitOrder(namespace, chat_id, order)
         layout = {'text': u'Заказ успешно добавлен!'}
 

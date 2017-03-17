@@ -78,6 +78,7 @@ def menu_button(bot, update):
         return
 
     # items = getItems(data['api_namespace'], query.data)
+
     callback = json.loads(query.data)
     if callback['chat'] == ITEM_CHAT:
         layout = getMenuLayout(data['api_namespace'], query.message.chat_id, json.loads(query.data))
@@ -94,7 +95,7 @@ def menu_button(bot, update):
 
     reply_markup = InlineKeyboardMarkup(keyboard)
 
-    bot.editMessageText(text="Menu: \n " + (layout['text'] or ''),
+    bot.editMessageText(text=(layout['text'] or '_____'),
                         chat_id=query.message.chat_id,
                         message_id=query.message.message_id,
                         reply_markup=reply_markup)
