@@ -23,11 +23,10 @@ state = {'steps': []}
 
 
 def getStateByChatId(chat_id):
-    return state
+    return json.loads(getMenuStateByChatId(chat_id))
 
 def saveState(chat_id, st):
-    global state
-    state = st
+    updateMenuStateByChatId(chat_id, st)
 
 def make_step_cat(catlist, c_id):
     for entry in catlist:
