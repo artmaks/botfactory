@@ -103,7 +103,7 @@ def menu_button(bot, update):
 
 @checkAuth
 def help(bot, update):
-    bot.sendMessage(update.message.chat_id, text='Help!')
+    bot.sendMessage(update.message.chat_id, text=u'Для начала заказа введите команду /menu')
 
 
 @checkAuth
