@@ -83,7 +83,7 @@ def getEditLayout(chat_id):
         buttons.append(b)
 
     cb_back = makeMainCB()
-    b_back = makeButton(u'<- Назад', cb_back)
+    b_back = makeButton(u'« Назад', cb_back)
     buttons.append(b_back)
 
     layout['buttons'] = buttons

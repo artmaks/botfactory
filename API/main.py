@@ -64,7 +64,7 @@ def list_categories(categories, steps):
 
     if len(steps) > 0:
         cb = makeEmptyCB('back')
-        res += [makeButton(u'<- Назад', cb)]
+        res += [makeButton(u'« Назад', cb)]
 
     return {'buttons': res}
 
@@ -78,7 +78,7 @@ def list_items(items, steps):
 
     if len(steps) > 0:
         cb = makeEmptyCB('back')
-        res += [makeButton(u'<- Назад', cb)]
+        res += [makeButton(u'« Назад', cb)]
 
     return {'buttons': res}
 
@@ -162,7 +162,7 @@ def getItemLayout(item):
     buttons += [b_add]
 
     cb_back = makeEmptyCB('back')
-    b_back = makeButton(u'<- Назад', cb_back)
+    b_back = makeButton(u'« Назад', cb_back)
     buttons += [b_back]
 
     layout['buttons'] = buttons
@@ -330,7 +330,7 @@ def getMenuLayout(namespace, chat_id, callback=None):
         state = {'steps': []}
         # updateOrderStateByChatId(chat_id, order)
         layout = getContinueOrderLayout()
-        layout['text'] = buildItemsString(items)
+
 
 
     saveState(chat_id, state)

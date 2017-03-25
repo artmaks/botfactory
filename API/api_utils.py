@@ -193,7 +193,9 @@ def getOrderCostDict(order):
     return cost
 
 def itemDictToStr(item):
-    return unicode(u"{0} (x{1}) - {2}руб.".format(item['name'], item['count'], item['count'] * item['price']))
+    if 'name' in item:
+        item['title'] = item['name']
+    return unicode(u"{0} (x{1}) - {2}руб.".format(item['title'], item['count'], item['count'] * item['price']))
 
 
 def buildItemsStringDict(order):

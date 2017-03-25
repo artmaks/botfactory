@@ -60,7 +60,7 @@ def menu(bot, update):
 
     reply_markup = InlineKeyboardMarkup(keyboard)
 
-    update.message.reply_text('Menu:', reply_markup=reply_markup)
+    update.message.reply_text(layout['text'] or '_____', reply_markup=reply_markup)
 
 
 @checkAuth
