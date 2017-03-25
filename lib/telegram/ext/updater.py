@@ -44,7 +44,7 @@ class Updater(object):
     purpose is to receive the updates from Telegram and to deliver them to said
     dispatcher. It also runs in a separate thread, so the user can interact
     with the bot, for example on the command line. The dispatcher supports
-    handlers for different kinds of data: Updates from Telegram, basic text
+    request_handling for different kinds of data: Updates from Telegram, basic text
     commands and even arbitrary types.
     The updater can be started as a polling service or, for production, use a
     webhook to receive updates. This is achieved using the WebhookServer and

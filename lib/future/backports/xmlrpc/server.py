@@ -160,7 +160,7 @@ def list_public_methods(obj):
 class SimpleXMLRPCDispatcher(object):
     """Mix-in class that dispatches XML-RPC requests.
 
-    This class is used to register XML-RPC method handlers
+    This class is used to register XML-RPC method request_handling
     and then to dispatch them. This class doesn't need to be
     instanced directly when used by SimpleXMLRPCServer but it
     can be instanced when used by the MultiPathXMLRPCServer

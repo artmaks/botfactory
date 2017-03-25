@@ -1,18 +1,16 @@
 # -*- coding: utf-8 -*-
-from handlers.message_handler import logger
-
-from API.main import *
-from API.order_menu import *
-from API.checkout_menu import getCheckoutMenuLayout
-from models.Models import *
 
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup
-from utils.register import authStatus, checkAuth, registerNewUser
+
+from API.checkout_menu import getCheckoutMenuLayout
+from API.main import *
+from API.order_menu import *
+from request_handling.bot_registry import logger
 from utils.data import *
-import json
-from google.appengine.ext import ndb
+from utils.register import authStatus, checkAuth, registerNewUser
 
 orders = {}
+
 
 def text_handler(bot, update):
     bot_name = bot.name.replace('@', '')
@@ -71,7 +69,7 @@ def menu_button(bot, update):
     data = getBotDataByName(bot_name)
 
     # Если id сообщения отличается не больше чем на 1, так как в телеграме сообщения дублируются
-    if(query.message.message_id - 1 != getCurrentMenuMessage(query.message.chat_id)):
+    if (query.message.message_id - 1 != getCurrentMenuMessage(query.message.chat_id)):
         bot.editMessageText(text="Воспользуйтесь последним открытым меню",
             chat_id=query.message.chat_id,
             message_id=query.message.message_id)

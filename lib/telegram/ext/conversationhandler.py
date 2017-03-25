@@ -28,13 +28,13 @@ from telegram.utils.promise import Promise
 
 class ConversationHandler(Handler):
     """
-    A handler to hold a conversation with a user by managing four collections of other handlers.
+    A handler to hold a conversation with a user by managing four collections of other request_handling.
 
     The first collection, a ``list`` named ``entry_points``, is used to initiate the conversation,
     for example with a ``CommandHandler`` or ``RegexHandler``.
 
     The second collection, a ``dict`` named ``states``, contains the different conversation steps
-    and one or more associated handlers that should be used if the user sends a message when the
+    and one or more associated request_handling that should be used if the user sends a message when the
     conversation with them is currently in that state. You will probably use mostly
     ``MessageHandler`` and ``RegexHandler`` here.
 
@@ -44,7 +44,7 @@ class ConversationHandler(Handler):
     a regular text message is expected. You could use this for a ``/cancel`` command or to let the
     user know their message was not recognized.
 
-    The fourth, optional collection of handlers, a ``list`` named ``timed_out_behavior`` is used if
+    The fourth, optional collection of request_handling, a ``list`` named ``timed_out_behavior`` is used if
     the wait for ``run_async`` takes longer than defined in ``run_async_timeout``. For example,
     you can let the user know that they should wait for a bit before they can continue.
 
@@ -61,7 +61,7 @@ class ConversationHandler(Handler):
             conversation a user can be in and one or more associated ``Handler`` objects that
             should be used in that state. The first handler which ``check_update`` method returns
             ``True`` will be used.
-        fallbacks (list): A list of handlers that might be used if the user is in a conversation,
+        fallbacks (list): A list of request_handling that might be used if the user is in a conversation,
             but every handler for their current state returned ``False`` on ``check_update``.
             The first handler which ``check_update`` method returns ``True`` will be used. If all
             return ``False``, the update is not handled.
@@ -72,7 +72,7 @@ class ConversationHandler(Handler):
             next message arrives. This timeout defines how long the conversation handler should
             wait for the next state to be computed. The default is ``None`` which means it will
             wait indefinitely.
-        timed_out_behavior (Optional[list]): A list of handlers that might be used if
+        timed_out_behavior (Optional[list]): A list of request_handling that might be used if
             the wait for ``run_async`` timed out. The first handler which ``check_update`` method
             returns ``True`` will be used. If all return ``False``, the update is not handled.
 
@@ -168,7 +168,7 @@ class ConversationHandler(Handler):
                     handler = candidate
                     break
 
-            # Find a fallback handler if all other handlers fail
+            # Find a fallback handler if all other request_handling fail
             else:
                 for fallback in self.fallbacks:
                     if fallback.check_update(update):

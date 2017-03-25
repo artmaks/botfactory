@@ -16,7 +16,7 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-""" This module contains the base class for handlers as used by the
+""" This module contains the base class for request_handling as used by the
 Dispatcher """
 
 from telegram.utils.deprecate import deprecate
@@ -25,7 +25,7 @@ from telegram.utils.helpers import extract_chat_and_user
 
 class Handler(object):
     """
-    The base class for all update handlers. You can create your own handlers
+    The base class for all update request_handling. You can create your own request_handling
     by inheriting from this class.
 
     Args:
@@ -93,7 +93,7 @@ class Handler(object):
     def collect_optional_args(self, dispatcher, update=None):
         """
         Prepares the optional arguments that are the same for all types of
-        handlers
+        request_handling
 
         Args:
             dispatcher (telegram.ext.Dispatcher):

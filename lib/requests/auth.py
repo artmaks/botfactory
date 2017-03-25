@@ -4,7 +4,7 @@
 requests.auth
 ~~~~~~~~~~~~~
 
-This module contains the authentication handlers for Requests.
+This module contains the authentication request_handling for Requests.
 """
 
 import os

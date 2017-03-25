@@ -15,20 +15,24 @@ TYPE = 't'
 
 # ============ Item callbacks ===============
 
+
 def makeItemMenuCB():
     cb = {}
     cb['chat'] = ITEM_CHAT
     return cb
+
 
 def makeEmptyCB(type):
     cb = makeItemMenuCB()
     cb[TYPE] = type
     return cb
 
+
 def makeCBWithID(type, id):
     cb = makeEmptyCB(type)
     cb['id'] = id
     return cb
+
 
 def makeCountItemCB(val):
     cb = makeEmptyCB('count')
@@ -38,10 +42,12 @@ def makeCountItemCB(val):
 
 # ============= Order callbacks =============
 
+
 def makeOrderCB():
     cb = {}
     cb['chat'] = ORDER_CHAT
     return cb
+
 
 def makeMainCB():
     cb = makeOrderCB()

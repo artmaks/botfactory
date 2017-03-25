@@ -397,9 +397,9 @@ class OpenerDirector(object):
     def __init__(self):
         client_version = "Python-urllib/%s" % __version__
         self.addheaders = [('User-agent', client_version)]
-        # self.handlers is retained only for backward compatibility
+        # self.request_handling is retained only for backward compatibility
         self.handlers = []
-        # manage the individual handlers
+        # manage the individual request_handling
         self.handle_open = {}
         self.handle_error = {}
         self.process_response = {}
@@ -542,13 +542,13 @@ class OpenerDirector(object):
 # make sense to include both
 
 def build_opener(*handlers):
-    """Create an opener object from a list of handlers.
+    """Create an opener object from a list of request_handling.
 
-    The opener will use several default handlers, including support
+    The opener will use several default request_handling, including support
     for HTTP, FTP and when applicable HTTPS.
 
-    If any of the handlers passed as arguments are subclasses of the
-    default handlers, the default handlers will not be used.
+    If any of the request_handling passed as arguments are subclasses of the
+    default request_handling, the default request_handling will not be used.
     """
     def isclass(obj):
         return isinstance(obj, type) or hasattr(obj, "__bases__")
@@ -692,7 +692,7 @@ class HTTPRedirectHandler(BaseHandler):
 
         # XXX Probably want to forget about the state of the current
         # request, although that might interact poorly with other
-        # handlers that also use handler-specific request attributes
+        # request_handling that also use handler-specific request attributes
         new = self.redirect_request(req, fp, code, msg, headers, newurl)
         if new is None:
             return
@@ -826,10 +826,10 @@ class ProxyHandler(BaseHandler):
         hostport = unquote(hostport)
         req.set_proxy(hostport, proxy_type)
         if orig_type == proxy_type or orig_type == 'https':
-            # let other handlers take care of it
+            # let other request_handling take care of it
             return None
         else:
-            # need to start over, because the other handlers don't
+            # need to start over, because the other request_handling don't
             # grok the proxy's URL type
             # e.g. if we have a constructor arg proxies like so:
             # {'http': 'ftp://proxy.example.com'}, we may end up turning
@@ -1878,7 +1878,7 @@ class URLopener(object):
     def http_error(self, url, fp, errcode, errmsg, headers, data=None):
         """Handle http errors.
 
-        Derived class can override this, or provide specific handlers
+        Derived class can override this, or provide specific request_handling
         named http_error_DDD where DDD is the 3-digit error code."""
         # First check if there's a specific handler for this error
         name = 'http_error_%d' % errcode
@@ -2048,7 +2048,7 @@ class URLopener(object):
 
 
 class FancyURLopener(URLopener):
-    """Derived class with handlers for errors we can handle (perhaps)."""
+    """Derived class with request_handling for errors we can handle (perhaps)."""
 
     def __init__(self, *args, **kwargs):
         URLopener.__init__(self, *args, **kwargs)
