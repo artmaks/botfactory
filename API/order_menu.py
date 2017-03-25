@@ -19,7 +19,7 @@ sys.setdefaultencoding('utf8')
 def emptyOrderLayout():
     layout = {}
     layout['buttons'] = []
-    layout['text'] = u"Ваш заказ пуст."
+    layout['text'] = u"Ваш заказ пуст"
 
     return layout
 

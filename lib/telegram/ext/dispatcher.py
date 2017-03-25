@@ -63,11 +63,11 @@ def run_async(func):
 
 class Dispatcher(object):
     """
-    This class dispatches all kinds of updates to its registered handlers.
+    This class dispatches all kinds of updates to its registered request_handling.
 
     Args:
         bot (telegram.Bot): The bot object that should be passed to the
-            handlers
+            request_handling
         update_queue (Queue): The synchronized queue that will contain the
             updates.
         job_queue (Optional[telegram.ext.JobQueue]): The ``JobQueue`` instance to pass onto handler
@@ -292,21 +292,21 @@ class Dispatcher(object):
         """
         Register a handler.
 
-        TL;DR: Order and priority counts. 0 or 1 handlers per group will be
+        TL;DR: Order and priority counts. 0 or 1 request_handling per group will be
         used.
 
         A handler must be an instance of a subclass of
-        telegram.ext.Handler. All handlers are organized in groups with a
+        telegram.ext.Handler. All request_handling are organized in groups with a
         numeric value. The default group is 0. All groups will be evaluated for
         handling an update, but only 0 or 1 handler per group will be used.
 
-        The priority/order of handlers is determined as follows:
+        The priority/order of request_handling is determined as follows:
 
           * Priority of the group (lower group number == higher priority)
 
           * The first handler in a group which should handle an update will be
-            used. Other handlers from the group will not be used. The order in
-            which handlers were added to the group defines the priority.
+            used. Other request_handling from the group will not be used. The order in
+            which request_handling were added to the group defines the priority.
 
         Args:
             handler (telegram.ext.Handler): A Handler instance

@@ -19,8 +19,6 @@ def get_menu(namespace):
     else:
         return 'Error'
 
-state = {'steps': []}
-
 
 def getStateByChatId(chat_id):
     return json.loads(getMenuStateByChatId(chat_id))
