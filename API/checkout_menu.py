@@ -49,7 +49,7 @@ def getPlaceLayout():
     b_stay = makeButton(u'В кафе', cb_stay)
 
     cb_out = makeMoveCallback('time', 'place', 'out')
-    b_out = makeButton(u'С собой', cb_out)
+    b_out = makeButton(u'Заберу заказ с собой', cb_out)
 
     cb_back = makeMoveCallback('address')
     b_back = makeButton(u'<- Назад', cb_back)
@@ -155,6 +155,7 @@ def getFinalLayout(order, namespace):
     buttons.append(b_back)
 
     layout['buttons'] = buttons
+    layout['text'] = u"Подтверлить заказ"
 
     return layout
 
@@ -165,7 +166,6 @@ def submitOrder(namespace, chat_id, order):
 def getCheckoutMenuLayout(namespace, chat_id, callback):
 
     order = loadOrder(chat_id)
-
 
     if 'update' in callback and callback['update'] is not None:
         order[callback['update']] = callback['val']

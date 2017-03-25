@@ -19,7 +19,7 @@ sys.setdefaultencoding('utf8')
 def emptyOrderLayout():
     layout = {}
     layout['buttons'] = []
-    layout['text'] = u"Ваш заказ пуст."
+    layout['text'] = u"Ваш заказ пуст"
 
     return layout
 
@@ -87,6 +87,7 @@ def getEditLayout(chat_id):
     buttons.append(b_back)
 
     layout['buttons'] = buttons
+    layout['text'] = u"Выберите товар"
 
     s = str(layout['buttons'][0])
 

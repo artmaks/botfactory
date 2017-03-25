@@ -91,13 +91,14 @@ def getItemsBySteps(menu, steps):
     return menu
 
 
-def getCategoryLayout(menu, steps):
+def getCategoryLayout(chat_id, menu, steps):
 
     if len(steps) == 0:
         layout = list_categories(menu, steps)
         cb_order = makeMainCB()
         b = makeButton(u'Перейти к заказу', cb_order)
         layout['buttons'].append(b)
+        layout['text'] = buildItemsString(items)
         return layout
 
     first = True
@@ -109,9 +110,10 @@ def getCategoryLayout(menu, steps):
 
     if typelast == 'categ':
         if len(menu['categories']) != 0:
-            return list_categories(menu['categories'], steps)
+            layout = list_categories(menu['categories'], steps)
         else:
-            return list_items(menu['items'], steps)
+            layout = list_items(menu['items'], steps)
+        return layout
 
 def getPrice(item):
     cost = item['price']
@@ -132,9 +134,9 @@ def getItemLayout(item):
     layout = {}
     layout['img'] = item['pic']
 
-    cost = getCost(item)
+    # cost = getCost(item)
 
-    layout['text'] = u'{0} ({1})\nЦена: {2}'.format(item['title'], item['count'], cost)
+    layout['text'] = itemDictToStr(item)
 
     buttons = []
 
@@ -188,6 +190,7 @@ def updateChoices(choices, toSelect):
 def getOptionLayout(item, option_name):
     # pprint(getChoicesJson(item, option_name))
     choices, opt_ind = getChoicesJson(item, option_name)
+    layout = {}
     buttons = []
     for i, ch in enumerate(choices):
         cost = ch['price']
@@ -199,8 +202,10 @@ def getOptionLayout(item, option_name):
         button = makeButton(name, cb)
 
         buttons += [button]
+    layout['buttons'] = buttons
+    layout['text'] = itemDictToStr(item)
 
-    return {'buttons': buttons}
+    return layout
 
 
 def getChoiceIndex(choices, tofind):
@@ -266,12 +271,15 @@ def getMenuLayout(namespace, chat_id, callback=None):
 
     state = getStateByChatId(chat_id)
 
+    items = loadOrder(chat_id)['items']
+
     if cb_type == 'category':
         steps = state['steps']
         if callback['id'] is not None:
             step = {'id': callback['id'], TYPE: 'categ'}
             state['steps'].append(step)
-        layout = getCategoryLayout(menu, steps)
+        layout = getCategoryLayout(chat_id, menu, steps)
+        layout['text'] = buildItemsString(items)
 
     elif cb_type == 'item':
         step = {'id': callback['id'], TYPE: 'item'}
@@ -307,7 +315,8 @@ def getMenuLayout(namespace, chat_id, callback=None):
         state['steps'] = state['steps'][:-1]
         state['item'] = None
 
-        layout = getCategoryLayout(menu, state['steps'])
+        layout = getCategoryLayout(chat_id, menu, state['steps'])
+        layout['text'] = buildItemsString(items)
 
     elif cb_type == 'add':
         order = loadOrder(chat_id)['items']
@@ -322,13 +331,11 @@ def getMenuLayout(namespace, chat_id, callback=None):
         state = {'steps': []}
         # updateOrderStateByChatId(chat_id, order)
         layout = getContinueOrderLayout()
+        layout['text'] = buildItemsString(items)
 
-    # elif cb_type == 'continue_order':
-    #     layout = getMenuLayout(namespace, chat_id)
 
     saveState(chat_id, state)
 
-    # pprint(layout)
     return layoutComplement(layout)
 
 
