@@ -91,14 +91,13 @@ def getItemsBySteps(menu, steps):
     return menu
 
 
-def getCategoryLayout(chat_id, menu, steps):
+def getCategoryLayout(menu, steps):
 
     if len(steps) == 0:
         layout = list_categories(menu, steps)
         cb_order = makeMainCB()
         b = makeButton(u'Перейти к заказу', cb_order)
         layout['buttons'].append(b)
-        layout['text'] = buildItemsString(items)
         return layout
 
     first = True
@@ -278,7 +277,7 @@ def getMenuLayout(namespace, chat_id, callback=None):
         if callback['id'] is not None:
             step = {'id': callback['id'], TYPE: 'categ'}
             state['steps'].append(step)
-        layout = getCategoryLayout(chat_id, menu, steps)
+        layout = getCategoryLayout(menu, steps)
         layout['text'] = buildItemsString(items)
 
     elif cb_type == 'item':
@@ -315,7 +314,7 @@ def getMenuLayout(namespace, chat_id, callback=None):
         state['steps'] = state['steps'][:-1]
         state['item'] = None
 
-        layout = getCategoryLayout(chat_id, menu, state['steps'])
+        layout = getCategoryLayout(menu, state['steps'])
         layout['text'] = buildItemsString(items)
 
     elif cb_type == 'add':
