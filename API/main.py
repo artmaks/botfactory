@@ -80,6 +80,7 @@ def list_items(items, steps):
 
     return {'buttons': res}
 
+
 def getItemsBySteps(menu, steps):
     first = True
     for step in steps:
@@ -254,6 +255,7 @@ def constructItem(item_dict):
                 item_count,
                 item_price)
     return item
+
 
 def getMenuLayout(namespace, chat_id, callback=None):
     menu = get_menu(namespace)['menu']
