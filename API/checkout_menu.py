@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from api_utils import loadOrder, saveOrder, makeMoveCallback, \
+from api_utils import loadOrder, saveOrder, clearOrder, makeMoveCallback, \
     makeButton, makeMainCB, buildItemsStringDict, layoutComplement, \
     TYPE
 
@@ -201,6 +201,8 @@ def getCheckoutMenuLayout(namespace, chat_id, callback):
 
     elif callback[TYPE] == 'submit':
         res = submitOrder(namespace, chat_id, order)
+        # check success
+        clearOrder(chat_id)
         layout = {'text': u'Заказ успешно добавлен %s %s \n %s!' % (res.status_code, json.loads(res.text)['description'], order)}
 
     layout = layoutComplement(layout)
@@ -217,7 +219,7 @@ def getOrderSubmissionJSON(usr, order):
         },
         "comment": "",
         "coordinates": "0.0,0.0",
-        "delivery_sum": 0,
+        "delivery_sum": 100,
         "device_type": 1,
         "order_gifts": [
         ],
@@ -228,35 +230,35 @@ def getOrderSubmissionJSON(usr, order):
             "type_id": 0,
             "wallet_payment": 0
         },
-        "total_sum": 250,
+        "total_sum": 100,
         "venue_id": "5720147234914304",
         "items": [
             {
                 "quantity": 1,
-                "item_id": "5692462144159744",
+                "item_id": "5159696684023808",
                 "single_modifiers": [
                 ],
                 "group_modifiers": [
-                    {
-                        "group_modifier_id": "5652383656837120",
-                        "choice": "10",
-                        "quantity": 1
-                    }
+                    # {
+                    #     "group_modifier_id": "5652383656837120",
+                    #     "choice": "10",
+                    #     "quantity": 1
+                    # }
                 ]
             },
-            {
-                "quantity": 1,
-                "item_id": "5091364022779904",
-                "single_modifiers": [
-                ],
-                "group_modifiers": [
-                    {
-                        "group_modifier_id": "5652383656837120",
-                        "choice": "183",
-                        "quantity": 1
-                    }
-                ]
-            }
+            # {
+            #     "quantity": 1,
+            #     "item_id": "5091364022779904",
+            #     "single_modifiers": [
+            #     ],
+            #     "group_modifiers": [
+            #         {
+            #             "group_modifier_id": "5652383656837120",
+            #             "choice": "183",
+            #             "quantity": 1
+            #         }
+            #     ]
+            # }
         ],
         "gifts": [
         ],
