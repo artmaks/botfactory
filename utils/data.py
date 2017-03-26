@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from models.Models import BotModel, NavigationState, OrderState
+from models.Models import BotModel, NavigationState, OrderState, Users
 import json
 import sys
 reload(sys)
@@ -21,13 +21,16 @@ def resetMenuState(chat_id, message_id):
     state_entity.put()
 
 #======= Menu ======
+
 def getCurrentMenuMessage(chat_id):
     state = [p.to_dict() for p in NavigationState.query(NavigationState.chat_id == str(chat_id)).fetch()]
     return state[0]['message_id'] if len(state) > 0 else None
 
+
 def getMenuStateByChatId(chat_id):
     state = [p.to_dict() for p in NavigationState.query(NavigationState.chat_id == str(chat_id)).fetch()]
     return state[0]['state'] if len(state) > 0 else '{"steps": []}'
+
 
 def updateMenuStateByChatId(chat_id, new_state):
     json_state = json.dumps(new_state)
@@ -44,6 +47,8 @@ def updateMenuStateByChatId(chat_id, new_state):
         state_entity.put()
 
 #======= Orders state ======
+
+
 def defaultOrder():
     return {'items': {},
             'address': None,
@@ -62,6 +67,7 @@ def orderToOrderDict(order):
     items  = {i: order['items'][i].to_dict() for i in order['items']}
     order['items'] = items
     return order
+
 
 def getOrderStateByChatId(chat_id):
     state = [p.to_dict() for p in OrderState.query(OrderState.chat_id == str(chat_id)).fetch()]
@@ -91,6 +97,12 @@ def updateOrderStateByChatId(chat_id, new_state):
         state_entity.state = json_state
         state_entity.put()
 
+
+# ========= Users ===============
+
+def getUserByChatId(chat_id):
+    users = [p.to_dict() for p in Users.query(Users.chat_id == str(chat_id)).fetch()]
+    return users[0] if len(users) > 0 else None
 
 # ========= Order Item ==========
 

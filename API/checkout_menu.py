@@ -4,6 +4,10 @@ from api_utils import loadOrder, saveOrder, makeMoveCallback, \
     makeButton, makeMainCB, buildItemsStringDict, layoutComplement, \
     TYPE
 
+import requests
+import json
+from utils.data import getUserByChatId
+
 import sys
 reload(sys)
 sys.setdefaultencoding('utf8')
@@ -11,12 +15,15 @@ sys.setdefaultencoding('utf8')
 
 addrs = {0: u'ул. Маршала Бирюзова 5', 1: u'пр. Мира 57'}
 
+
 def getAddresses(namespace):
     return addrs
+
 
 def getAddressById(namespace, id):
     addrs = getAddresses(namespace)
     return addrs[id]
+
 
 def getAddressLayout(namespace):
     addrs  = getAddresses(namespace)
@@ -60,21 +67,21 @@ def getPlaceLayout():
 
     return layout
 
+
 def buildTimeString(time):
     if time == 0:
         return u'Прямо сейчас'
     else:
         return u'Через {0} минут'.format(time)
 
+
 def getTimeLayout():
     layout = {}
-
     layout['text'] = u"Когда планируете забрать заказ?"
-
     buttons = []
 
     for i in range(4):
-        aft = i*5
+        aft = i * 5
         cb = makeMoveCallback('pay', 'time', aft)
         b = makeButton(buildTimeString(aft), cb)
         buttons.append(b)
@@ -108,11 +115,13 @@ def getPayLayout():
 
     return layout
 
+
 def getPlaceString(place):
     if place == 'stay':
         return u'В кафе'
     elif place == 'out':
         return u'С собой'
+
 
 def getPayString(pay):
     if pay == 'cash':
@@ -141,6 +150,7 @@ def buildOrderString(order, namespace):
 
     return '\n'.join(lines)
 
+
 def getFinalLayout(order, namespace):
     layout = {}
     layout['text'] = buildOrderString(order, namespace)
@@ -160,12 +170,15 @@ def getFinalLayout(order, namespace):
 
 
 def submitOrder(namespace, chat_id, order):
-    pass
+    user = getUserByChatId(chat_id)
+    order_json = getOrderSubmissionJSON(user, order)
+    return requests.post('http://%s.1.doubleb-automation-production.appspot.com/api/order' % namespace,
+                  params={'order': json.dumps(order_json)})
+
 
 def getCheckoutMenuLayout(namespace, chat_id, callback):
 
     order = loadOrder(chat_id)
-
 
     if 'update' in callback and callback['update'] is not None:
         order[callback['update']] = callback['val']
@@ -187,9 +200,68 @@ def getCheckoutMenuLayout(namespace, chat_id, callback):
         layout = getFinalLayout(order, namespace)
 
     elif callback[TYPE] == 'submit':
-        submitOrder(namespace, chat_id, order)
-        layout = {'text': u'Заказ успешно добавлен!'}
+        res = submitOrder(namespace, chat_id, order)
+        layout = {'text': u'Заказ успешно добавлен %s %s \n %s!' % (res.status_code, json.loads(res.text)['description'], order)}
 
     layout = layoutComplement(layout)
     return layout
 
+
+def getOrderSubmissionJSON(usr, order):
+    return {
+        "client": {
+            "email": "",
+            "id": usr['api_user_id'],
+            "name": usr['name'],
+            "phone": "79268551369"
+        },
+        "comment": "",
+        "coordinates": "0.0,0.0",
+        "delivery_sum": 0,
+        "device_type": 1,
+        "order_gifts": [
+        ],
+        "payment": {
+            "binding_id": None,
+            "client_id": None,
+            "return_url": None,
+            "type_id": 0,
+            "wallet_payment": 0
+        },
+        "total_sum": 250,
+        "venue_id": "5720147234914304",
+        "items": [
+            {
+                "quantity": 1,
+                "item_id": "5692462144159744",
+                "single_modifiers": [
+                ],
+                "group_modifiers": [
+                    {
+                        "group_modifier_id": "5652383656837120",
+                        "choice": "10",
+                        "quantity": 1
+                    }
+                ]
+            },
+            {
+                "quantity": 1,
+                "item_id": "5091364022779904",
+                "single_modifiers": [
+                ],
+                "group_modifiers": [
+                    {
+                        "group_modifier_id": "5652383656837120",
+                        "choice": "183",
+                        "quantity": 1
+                    }
+                ]
+            }
+        ],
+        "gifts": [
+        ],
+        "after_error": False,
+        "delivery_type": 0,
+        "delivery_slot_id": "5639445604728832",
+        "time_picker_value": "2017-03-25 15:20:10"
+    }
