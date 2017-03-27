@@ -217,7 +217,7 @@ def getCheckoutMenuLayout(namespace, chat_id, callback):
         res, order_json = submitOrder(namespace, chat_id, order)
         # check success
         clearOrder(chat_id)
-        layout = {'text': u'Заказ успешно добавлен %s %s \n %s!' % (res.status_code, json.loads(res.text)['description'], order_json)}
+        layout = {'text': u'Заказ успешно добавлен %s!' % res.text}
 
     layout = layoutComplement(layout)
     return layout
