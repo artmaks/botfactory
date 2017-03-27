@@ -39,7 +39,7 @@ def getAddressLayout(namespace):
         buttons.append(button)
 
     cb_back = makeMainCB()
-    b_back = makeButton(u'<- Назад', cb_back)
+    b_back = makeButton(u'« Назад', cb_back)
     buttons.append(b_back)
 
     layout['buttons'] = buttons
@@ -59,7 +59,7 @@ def getPlaceLayout():
     b_out = makeButton(u'Заберу заказ с собой', cb_out)
 
     cb_back = makeMoveCallback('address')
-    b_back = makeButton(u'<- Назад', cb_back)
+    b_back = makeButton(u'« Назад', cb_back)
 
     buttons = [b_stay, b_out, b_back]
 
@@ -91,7 +91,7 @@ def getTimeLayout(namespace, chat_id):
         buttons.append(b)
 
     cb_back = makeMoveCallback('place')
-    b_back = makeButton(u'<- Назад', cb_back)
+    b_back = makeButton(u'« Назад', cb_back)
     buttons.append(b_back)
 
     layout['buttons'] = buttons
@@ -111,7 +111,7 @@ def getPayLayout():
     b_card = makeButton(u'Картой', cb_card)
 
     cb_back = makeMoveCallback('time')
-    b_back = makeButton(u'<- Назад', cb_back)
+    b_back = makeButton(u'« Назад', cb_back)
 
     buttons = [b_cash, b_card, b_back]
 
@@ -165,7 +165,7 @@ def getFinalLayout(order, namespace):
     buttons.append(b_submit)
 
     cb_back = makeMoveCallback('pay')
-    b_back = makeButton(u'<- Назад', cb_back)
+    b_back = makeButton(u'« Назад', cb_back)
     buttons.append(b_back)
 
     layout['buttons'] = buttons
