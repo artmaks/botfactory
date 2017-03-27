@@ -8,6 +8,7 @@ import requests
 import json
 from utils.data import getUserByChatId
 from main import get_venues_slot, get_venues
+from order_generation import convert
 
 import sys
 reload(sys)
@@ -172,9 +173,8 @@ def getFinalLayout(order, namespace):
     return layout
 
 
-def submitOrder(namespace, chat_id, order):
-    user = getUserByChatId(chat_id)
-    order_json = getOrderSubmissionJSON(user, order)
+def submitOrder(namespace, chat_id):
+    order_json = convert(namespace, chat_id)
     return requests.post('http://%s.1.doubleb-automation-production.appspot.com/api/order' % namespace,
                   params={'order': json.dumps(order_json)}), order_json
 
