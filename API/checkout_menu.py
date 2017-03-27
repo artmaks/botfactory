@@ -20,7 +20,7 @@ def getAddresses(namespace):
 
 def getAddressById(namespace, id):
     addrs = getAddresses(namespace)
-    return addrs[id]
+    return addrs[list(map(lambda item: item['id'], addrs)).index(id)]['title']
 
 
 def getAddressLayout(namespace):
