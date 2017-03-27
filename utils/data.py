@@ -77,7 +77,7 @@ def getOrderStateByChatId(chat_id):
 
     state_items = orderDictToOrder(json.loads(state[0]['state']))
 
-    # i = state_items['items']['5710239819104256']
+    # i = state_items['items']['5710239819104256']i
 
     return state_items
 
@@ -140,9 +140,9 @@ class Item:
         return item
 
 
-i = {'id': 1, 'name': 'safa', 'count': 1, 'price': 100}
-
-
-print(type(i))
-
-print(type(Item.from_dict(i)))
+# i = {'id': 1, 'name': 'safa', 'count': 1, 'price': 100}
+#
+#
+# print(type(i))
+#
+# print(type(Item.from_dict(i)))
