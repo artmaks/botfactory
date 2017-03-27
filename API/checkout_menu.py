@@ -173,7 +173,7 @@ def submitOrder(namespace, chat_id, order):
     user = getUserByChatId(chat_id)
     order_json = getOrderSubmissionJSON(user, order)
     return requests.post('http://%s.1.doubleb-automation-production.appspot.com/api/order' % namespace,
-                  params={'order': json.dumps(order_json)})
+                  params={'order': json.dumps(order_json)}), order_json
 
 
 def getCheckoutMenuLayout(namespace, chat_id, callback):
@@ -200,10 +200,10 @@ def getCheckoutMenuLayout(namespace, chat_id, callback):
         layout = getFinalLayout(order, namespace)
 
     elif callback[TYPE] == 'submit':
-        res = submitOrder(namespace, chat_id, order)
+        res, order_json = submitOrder(namespace, chat_id, order)
         # check success
         clearOrder(chat_id)
-        layout = {'text': u'Заказ успешно добавлен %s %s \n %s!' % (res.status_code, json.loads(res.text)['description'], order)}
+        layout = {'text': u'Заказ успешно добавлен %s %s \n %s!' % (res.status_code, json.loads(res.text)['description'], order_json)}
 
     layout = layoutComplement(layout)
     return layout
@@ -213,13 +213,13 @@ def getOrderSubmissionJSON(usr, order):
     return {
         "client": {
             "email": "",
-            "id": usr['api_user_id'],
-            "name": usr['name'],
-            "phone": "79268551369"
+            "id": str(usr['api_user_id']),
+            "name": str(usr['name']),
+            "phone": ""
         },
         "comment": "",
         "coordinates": "0.0,0.0",
-        "delivery_sum": 100,
+        "delivery_sum": 0,
         "device_type": 1,
         "order_gifts": [
         ],
@@ -230,35 +230,35 @@ def getOrderSubmissionJSON(usr, order):
             "type_id": 0,
             "wallet_payment": 0
         },
-        "total_sum": 100,
+        "total_sum": 250,
         "venue_id": "5720147234914304",
         "items": [
             {
                 "quantity": 1,
-                "item_id": "5159696684023808",
+                "item_id": "5692462144159744",
                 "single_modifiers": [
                 ],
                 "group_modifiers": [
-                    # {
-                    #     "group_modifier_id": "5652383656837120",
-                    #     "choice": "10",
-                    #     "quantity": 1
-                    # }
+                    {
+                        "group_modifier_id": "5652383656837120",
+                        "choice": "10",
+                        "quantity": 1
+                    }
                 ]
             },
-            # {
-            #     "quantity": 1,
-            #     "item_id": "5091364022779904",
-            #     "single_modifiers": [
-            #     ],
-            #     "group_modifiers": [
-            #         {
-            #             "group_modifier_id": "5652383656837120",
-            #             "choice": "183",
-            #             "quantity": 1
-            #         }
-            #     ]
-            # }
+            {
+                "quantity": 1,
+                "item_id": "5091364022779904",
+                "single_modifiers": [
+                ],
+                "group_modifiers": [
+                    {
+                        "group_modifier_id": "5652383656837120",
+                        "choice": "183",
+                        "quantity": 1
+                    }
+                ]
+            }
         ],
         "gifts": [
         ],
