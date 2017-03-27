@@ -19,6 +19,56 @@ def get_menu(namespace):
     else:
         return 'Error'
 
+# Получить полную информацию о кофейнях через API
+# Лучше не менять
+def get_venues_full_data(namespace):
+    url = 'http://%s.1.doubleb-automation-production.appspot.com/api/venues' % (namespace)
+    res = requests.get(url)
+    if (res.ok):
+        return json.loads(res.content)
+    else:
+        return 'Error'
+
+
+# Получить лист кофеен в формате {'id' ... , 'title' : ....}
+def get_venues(namespace):
+    venues = get_venues_full_data(namespace)
+    res = []
+
+    for i in venues['venues']:
+        res.append({'title': i['title'], 'id' : i['id']})
+
+    return res
+
+# Получить лист слотов для кофейни в формате {'id' ... , 'name' : ....}
+# Необходимо передать id кофейни
+def get_venues_slot(namespace, venue_id):
+    venues = get_venues_full_data(namespace)
+
+    venue = {}
+    res = []
+
+    for i in venues['venues']:
+        if i['id'] == venue_id:
+            venue = i
+            break
+
+    slots = venue['deliveries'][0]['slots']
+
+    for i in slots:
+        res.append({'name' : i['name'], 'id' : i['id']})
+
+    return res
+
+
+# Пример использования функций получения кофейни и слотов  !!!
+
+# venues = get_venues('slaviktest')
+# for i in venues:
+#     print i['id'] + " " + i['title'] + '\n'
+#     slots = get_venues_slot('slaviktest', i['id'])
+#     for k in slots:
+#         print '\t' + k['name'] + ' ' + k['id'] + '\n'
 
 def getStateByChatId(chat_id):
     return json.loads(getMenuStateByChatId(chat_id))
