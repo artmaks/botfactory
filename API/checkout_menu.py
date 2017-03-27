@@ -7,17 +7,15 @@ from api_utils import loadOrder, saveOrder, clearOrder, makeMoveCallback, \
 import requests
 import json
 from utils.data import getUserByChatId
+from main import get_venues_slot, get_venues
 
 import sys
 reload(sys)
 sys.setdefaultencoding('utf8')
 
 
-addrs = {0: u'ул. Маршала Бирюзова 5', 1: u'пр. Мира 57'}
-
-
 def getAddresses(namespace):
-    return addrs
+    return get_venues(namespace)
 
 
 def getAddressById(namespace, id):
@@ -26,16 +24,17 @@ def getAddressById(namespace, id):
 
 
 def getAddressLayout(namespace):
-    addrs  = getAddresses(namespace)
+    addrs = getAddresses(namespace)
 
     layout = {}
     layout['text'] = u"Где вы планируете забрать заказ?"
 
     buttons = []
+    keys = list(map(lambda item: item['id'], addrs))
 
-    for id in addrs:
-        cb = makeMoveCallback('place', update='address', upd_val=id)
-        button = makeButton(addrs[id], cb)
+    for addr in addrs:
+        cb = makeMoveCallback('place', update='address', upd_val=keys.index(addr['id']))
+        button = makeButton(addr['title'], cb)
         buttons.append(button)
 
     cb_back = makeMainCB()
@@ -75,15 +74,19 @@ def buildTimeString(time):
         return u'Через {0} минут'.format(time)
 
 
-def getTimeLayout():
+def getTimeLayout(namespace, chat_id):
     layout = {}
     layout['text'] = u"Когда планируете забрать заказ?"
     buttons = []
 
-    for i in range(4):
-        aft = i * 5
-        cb = makeMoveCallback('pay', 'time', aft)
-        b = makeButton(buildTimeString(aft), cb)
+    address_id = loadOrder(chat_id)['address']
+    time_slots = get_venues_slot(namespace, address_id)
+
+    slot_ids = list(map(lambda item: item['id'], time_slots))
+
+    for slot in time_slots:
+        cb = makeMoveCallback('pay', update='time', upd_val=slot_ids.index(slot['id']))
+        b = makeButton(slot['name'], cb)
         buttons.append(b)
 
     cb_back = makeMoveCallback('place')
@@ -176,12 +179,23 @@ def submitOrder(namespace, chat_id, order):
                   params={'order': json.dumps(order_json)}), order_json
 
 
-def getCheckoutMenuLayout(namespace, chat_id, callback):
+def transformUpdToId(namespace, chat_id, field_name, upd):
+    addrs = getAddresses(namespace)
+    if field_name == 'address':
+        curr_addr_id = addrs[upd]['id']
+        return curr_addr_id
+    if field_name == 'time':
+        order = loadOrder(chat_id)
+        slots = get_venues_slot(namespace, order['address'])
+        return slots[upd]['id']
+    return upd
 
+
+def getCheckoutMenuLayout(namespace, chat_id, callback):
     order = loadOrder(chat_id)
 
     if 'update' in callback and callback['update'] is not None:
-        order[callback['update']] = callback['val']
+        order[callback['update']] = transformUpdToId(namespace, chat_id, callback['update'], callback['val'])
         saveOrder(chat_id, order)
 
     if callback[TYPE] == 'address':
@@ -191,7 +205,7 @@ def getCheckoutMenuLayout(namespace, chat_id, callback):
         layout = getPlaceLayout()
 
     elif callback[TYPE] == 'time':
-        layout = getTimeLayout()
+        layout = getTimeLayout(namespace, chat_id)
 
     elif callback[TYPE] == 'pay':
         layout = getPayLayout()

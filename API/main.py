@@ -40,6 +40,9 @@ def get_venues(namespace):
 
     return res
 
+
+
+
 # Получить лист слотов для кофейни в формате {'id' ... , 'name' : ....}
 # Необходимо передать id кофейни
 def get_venues_slot(namespace, venue_id):
