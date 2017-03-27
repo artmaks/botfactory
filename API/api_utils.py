@@ -186,7 +186,7 @@ def getOrderCost(order):
 def buildItemsString(order):
     lines = []
 
-    lines.append(u'Ваш заказ:')
+    lines.append(u'Ваш заказ:\n')
 
     for id in order:
         lines.append(str(order[id]))
@@ -211,7 +211,7 @@ def itemDictToStr(item):
 def buildItemsStringDict(order):
     lines = []
 
-    lines.append(u'Ваш заказ:')
+    lines.append(u'Ваш заказ:\n')
 
     for id in order:
         lines.append(itemDictToStr(order[id]))

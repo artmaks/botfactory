@@ -217,67 +217,7 @@ def getCheckoutMenuLayout(namespace, chat_id, callback):
         res, order_json = submitOrder(namespace, chat_id)
         # check success
         clearOrder(chat_id)
-        layout = {'text': u'Заказ успешно добавлен %s!' % res.text}
+        layout = {'text': u'Заказ успешно добавлен %s %s!' % (res.status_code, res.text)}
 
     layout = layoutComplement(layout)
     return layout
-
-
-def getOrderSubmissionJSON(usr, order):
-    return {
-        "client": {
-            "email": "",
-            "id": str(usr['api_user_id']),
-            "name": str(usr['name']),
-            "phone": ""
-        },
-        "comment": "",
-        "coordinates": "0.0,0.0",
-        "delivery_sum": 0,
-        "device_type": 1,
-        "order_gifts": [
-        ],
-        "payment": {
-            "binding_id": None,
-            "client_id": None,
-            "return_url": None,
-            "type_id": 0,
-            "wallet_payment": 0
-        },
-        "total_sum": 250,
-        "venue_id": "5720147234914304",
-        "items": [
-            {
-                "quantity": 1,
-                "item_id": "5692462144159744",
-                "single_modifiers": [
-                ],
-                "group_modifiers": [
-                    {
-                        "group_modifier_id": "5652383656837120",
-                        "choice": "10",
-                        "quantity": 1
-                    }
-                ]
-            },
-            {
-                "quantity": 1,
-                "item_id": "5091364022779904",
-                "single_modifiers": [
-                ],
-                "group_modifiers": [
-                    {
-                        "group_modifier_id": "5652383656837120",
-                        "choice": "183",
-                        "quantity": 1
-                    }
-                ]
-            }
-        ],
-        "gifts": [
-        ],
-        "after_error": False,
-        "delivery_type": 0,
-        "delivery_slot_id": "5639445604728832",
-        "time_picker_value": "2017-03-25 15:20:10"
-    }

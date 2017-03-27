@@ -7,6 +7,7 @@ from pprint import pprint
 from API.api_utils import loadOrder, getOrderCost
 from time import gmtime, strftime
 from API.main import get_menu
+from utils.data import getUserByChatId
 # from API.order_menu import makeMainCB
 
 import sys
@@ -14,23 +15,14 @@ reload(sys)
 sys.setdefaultencoding('utf8')
 
 
-BASE_JSON = json.loads('{"client":{"email":"","id":"379165","name":"Славик","phone":"79268551369"},"comment":"","coordinates":"0.0,0.0","delivery_sum":0,"device_type":1,"order_gifts":[],"payment":{"binding_id":null,"client_id":null,"return_url":null,"type_id":0,"wallet_payment":0},"total_sum":250,"venue_id":"5720147234914304","items":[{"quantity":1,"item_id":"5692462144159744","single_modifiers":[],"group_modifiers":[{"group_modifier_id":"5652383656837120","choice":"10","quantity":1}]},{"quantity":1,"item_id":"5091364022779904","single_modifiers":[],"group_modifiers":[{"group_modifier_id":"5652383656837120","choice":"183","quantity":1}]}],"gifts":[],"after_error":false,"delivery_type":0,"delivery_slot_id":"5639445604728832","time_picker_value":"2017-03-25 15:20:10"}')
+BASE_JSON = json.loads('{"client":{},"comment":"","coordinates":"0.0,0.0","delivery_sum":0,"device_type":1,"order_gifts":[],"payment":{"binding_id":null,"client_id":null,"return_url":null,"type_id":0,"wallet_payment":0},"total_sum":250,"venue_id":"5720147234914304","items":[{"quantity":1,"item_id":"5692462144159744","single_modifiers":[],"group_modifiers":[{"group_modifier_id":"5652383656837120","choice":"10","quantity":1}]},{"quantity":1,"item_id":"5091364022779904","single_modifiers":[],"group_modifiers":[{"group_modifier_id":"5652383656837120","choice":"183","quantity":1}]}],"gifts":[],"after_error":false,"delivery_type":0,"delivery_slot_id":"5639445604728832","time_picker_value":"2017-03-25 15:20:10"}')
 
 pprint(BASE_JSON)
-
-def userNameByChatID(chat_id):
-    return u'Славик'
-
-def userIDByChatID(chat_id):
-    return "379165"
-
-def phoneByChatID(chat_id):
-    return "79268551369"
 
 def getItemByIdRec(id, categories):
     for cat in categories:
         if len(cat['categories']) > 0:
-            res = getItemByIdRec(cat['categories'])
+            res = getItemByIdRec(id, cat['categories'])
             if res is not None:
                 return res
 
@@ -72,7 +64,8 @@ def getGroupModifiers(namespace, ids):
 def convertItems(namespace, items):
     items_conv = []
 
-    for item in items:
+    for id in items:
+        item = items[id]
         item_conv = {}
 
         ids = item.getId().split('#')
@@ -87,14 +80,14 @@ def convertItems(namespace, items):
     return items_conv
 
 
-
-
 def convert(namespace, chat_id):
     res = BASE_JSON
 
-    res['client']['name'] = userNameByChatID(chat_id)
-    res['client']['id'] = userIDByChatID(chat_id)
-    res['client']['phone'] = phoneByChatID(chat_id)
+    user = getUserByChatId(chat_id)
+
+    res['client']['name'] = user['name']
+    res['client']['id'] = user['api_user_id']
+    res['client']['phone'] = "89996793459"
 
     order = loadOrder(chat_id)
 
