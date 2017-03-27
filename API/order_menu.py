@@ -87,7 +87,7 @@ def getEditLayout(chat_id):
     buttons.append(b_back)
 
     layout['buttons'] = buttons
-
+    layout['text'] = u"Выберите товар"
     s = str(layout['buttons'][0])
 
     s1 = str(layout['buttons'][1])

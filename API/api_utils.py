@@ -184,6 +184,9 @@ def getOrderCost(order):
 
 
 def buildItemsString(order):
+    if len(order) == 0:
+        return u"Ваш заказ пуст"
+
     lines = []
 
     lines.append(u'Ваш заказ:\n')

@@ -56,7 +56,7 @@ def getPlaceLayout():
     b_stay = makeButton(u'В кафе', cb_stay)
 
     cb_out = makeMoveCallback('time', 'place', 'out')
-    b_out = makeButton(u'С собой', cb_out)
+    b_out = makeButton(u'Заберу заказ с собой', cb_out)
 
     cb_back = makeMoveCallback('address')
     b_back = makeButton(u'<- Назад', cb_back)
@@ -169,6 +169,7 @@ def getFinalLayout(order, namespace):
     buttons.append(b_back)
 
     layout['buttons'] = buttons
+    layout['text'] = u"Подтвердить заказ"
 
     return layout
 
