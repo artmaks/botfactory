@@ -169,7 +169,6 @@ def getFinalLayout(order, namespace):
     buttons.append(b_back)
 
     layout['buttons'] = buttons
-    layout['text'] = u"Подтвердить заказ"
 
     return layout
 
